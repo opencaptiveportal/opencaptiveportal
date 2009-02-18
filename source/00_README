@@ -1,0 +1,23 @@
+TODO:
+- Make paths in Makefile and files identical (dynamic)
+- Also the user, who runs the webserver (and therefore the database, etc.)
+
+
+Services:
+The services are divided into "packages", but interact.
+
+* htdocs:
+  Show the landingpage and offers the API to the User to set the Routes to the WISPs.
+  Landingpage:    landingpage.php
+  Add Route:      route.php  needs:  manage-route.py
+  Del Route:      back.php   needs:  manage-route.py
+
+* iptables
+  Build the initial iptables-restore file.
+  template file:  iptables.tmpl
+  script:         make-iptables.py
+
+* Statusqueries for WISPs, like: "is there still client $foo"
+  XML RPC Server: xml-rpc-server.py
+  Add User:       add-user.py
+

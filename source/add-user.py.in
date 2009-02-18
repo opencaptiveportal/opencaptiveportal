@@ -1,0 +1,56 @@
+#!/usr/bin/python2.4
+#  -*- coding: UTF-8 -*-
+# vim: set fileencoding=UTF-8 tabstop=4 shiftwidth=4 expandtab :
+
+# config
+DB_FILE='@SHAREDIR@/pwlan.db'
+
+import sha, sys, getpass
+from pysqlite2 import dbapi2 as sqlite3
+
+if len(sys.argv) != 4 or getpass.getuser() != 'www-data':
+  print "Execute as user www-data!"
+  print "Usage:   %s username password privilege" % sys.argv[0]
+  print "Example: sudo -u www-data  %s testuser foobar xmlrpc" % sys.argv[0]
+  sys.exit(9)
+
+username  = sys.argv[1]
+password  = sys.argv[2]
+privilege = sys.argv[3]
+
+########################################
+# DB Kram
+def open_db():
+  try:
+    con = sqlite3.connect(DB_FILE)
+  except:
+    print "%s: Cannot open SQLite DB" % sys.argv[0]
+    sys.exit(9)
+  cur = con.cursor()
+  return (con, cur)
+
+def close_db(con, cur):
+  con.commit()
+  cur.close()
+  con.close()
+
+cp = sha.new(password)
+
+(con, cur) = open_db()
+cur.execute("""SELECT username 
+    FROM passwd
+    WHERE username = ?""", (username,))
+row = cur.fetchone()
+
+if row:
+  print "User exists in DB, please delete old user first!"
+  print "Hint: sudo -u www-data sqlite3 %s" % DB_FILE
+  print "DELETE FROM passwd WHERE username = '%s';" % username
+  close_db(con, cur)
+  sys.exit(9)
+
+ret = cur.execute("""INSERT INTO passwd (username, password, privilege)
+    VALUES (?, ?, ?)""", (username, cp.hexdigest(), privilege,))
+close_db(con, cur)
+sys.exit(ret)
+
