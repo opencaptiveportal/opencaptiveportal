@@ -1,0 +1,22 @@
+<?php
+
+# TODO:
+# Enough sanity checks ???
+
+$error_url = "http://www.isnichwahr.de/";
+
+$pattern_ipv4     = "/^\d{1,3}(\.\d{1,3}){3}$/";
+$pattern_ipv6     = "/^([0-9a-fA-F]{1,4})(\:([0-9a-fA-F]{1,4})){7}$/";
+
+$src_ip = $_SERVER['REMOTE_ADDR'];
+if (! (preg_match($pattern_ipv4, $src_ip) or 
+       preg_match($pattern_ipv6, $src_ip))) {
+    header ("Location: $error_url");
+    exit 9;
+}
+
+system("@LIBDIR@/manage-route.py del '$src_ip'");
+
+header ("Location: http://130.59.98.225/index.php");
+
+?>
