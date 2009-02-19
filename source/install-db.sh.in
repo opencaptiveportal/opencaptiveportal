@@ -1,0 +1,4 @@
+#!/bin/sh
+
+sudo -u @WWWUSER@ sh -c "cat @CONFDIR@/install-db.tmpl | sqlite3 @SHAREDIR@/pwlan.db"
+
