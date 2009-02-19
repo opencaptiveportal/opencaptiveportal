@@ -12,7 +12,6 @@ $src_ip = $_SERVER['REMOTE_ADDR'];
 if (! (preg_match($pattern_ipv4, $src_ip) or 
        preg_match($pattern_ipv6, $src_ip))) {
     header ("Location: $error_url");
-    exit 9;
 }
 
 system("@LIBDIR@/manage-route.py del '$src_ip'");

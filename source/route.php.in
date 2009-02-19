@@ -14,19 +14,16 @@ $src_ip   = $_SERVER['REMOTE_ADDR'];
 if (! (preg_match($pattern_ipv4, $src_ip) or 
        preg_match($pattern_ipv6, $src_ip))) {
     header ("Location: $error_url");
-    exit 9;
 }
 
 $provider = $_GET['provider'];
 if (! (preg_match($pattern_provider, $provider))) {
     header ("Location: $error_url");
-    exit 9;
 }
 
 $url      = $_GET['url'];
 if (! (preg_match($pattern_url, $url))) {
     header ("Location: $error_url");
-    exit 9;
 }
 
 system("@LIBDIR@/manage-route.py add '$src_ip' '$provider'");

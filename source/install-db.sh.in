@@ -2,3 +2,11 @@
 
 sudo -u @WWWUSER@ sh -c "cat @CONFDIR@/install-db.tmpl | sqlite3 @SHAREDIR@/pwlan.db"
 
+# Link *php files to /var/www
+/bin/rm -f @WWWDIR@/back.php
+/bin/ln -s @LIBDIR@/htdocs/back.php        @WWWDIR@/back.php
+/bin/rm -f @WWWDIR@/route.php
+/bin/ln -s @LIBDIR@/htdocs/route.php       @WWWDIR@/route.php
+/bin/rm -f @WWWDIR@/index.php
+/bin/ln -s @LIBDIR@/htdocs/landingpage.php @WWWDIR@/index.php
+

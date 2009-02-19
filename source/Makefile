@@ -10,9 +10,11 @@ INSTALL = install -c
 SED = sed
 
 pkg_name = opencaptiveportal
+
 CONFDIR  = etc/$(pkg_name)
 SHAREDIR = var/lib/$(pkg_name)
 LIBDIR   = usr/lib/$(pkg_name)
+WWWDIR   = var/www
 
 WWWUSER = www-data
 
@@ -29,7 +31,8 @@ all:
 		$(SED) -i -e 's#@CONFDIR@#/$(CONFDIR)#'   $$e; \
 		$(SED) -i -e 's#@SHAREDIR@#/$(SHAREDIR)#' $$e; \
 		$(SED) -i -e 's#@LIBDIR@#/$(LIBDIR)#'     $$e; \
-		$(SED) -i -e 's#@WWWUSER@#$(WWWUSER)#'   $$e; \
+		$(SED) -i -e 's#@WWWDIR@#/$(WWWDIR)#'      $$e; \
+		$(SED) -i -e 's#@WWWUSER@#$(WWWUSER)#'    $$e; \
 	done
 
 install: 
