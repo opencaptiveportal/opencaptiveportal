@@ -1,0 +1,245 @@
+#!/usr/bin/python2.4
+#  -*- coding: UTF-8 -*-
+# vim: set fileencoding=UTF-8 tabstop=4 shiftwidth=4 expandtab :
+
+# TODO:
+# - get specification for this from the WISPs ...
+
+# Config
+import socket
+LISTEN_IP=socket.gethostbyname(socket.getfqdn())
+LISTEN_PORT=1443
+LEASE_FILE="/var/lib/dhcp3/dhcpd.leases"
+DB_FILE='@SHAREDIR@/pwlan.db'
+API_VERSION=0.1
+
+from SimpleXMLRPCServer import SimpleXMLRPCServer
+from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
+from pysqlite2 import dbapi2 as sqlite3
+
+class RequestHandler(SimpleXMLRPCRequestHandler):
+  rpc_paths = ('/RPC2','/xmlrpc/presence.php',)
+
+# Create server
+server = SimpleXMLRPCServer((LISTEN_IP, LISTEN_PORT),
+                             requestHandler=RequestHandler)
+print "Listening on", LISTEN_IP", port", LISTEN_PORT, "..."
+server.register_introspection_functions()
+
+########################################
+# DB Kram
+def open_db():
+  try:
+    con = sqlite3.connect(DB_FILE)
+  except:
+    print "%s: Cannot open SQLite DB" % sys.argv[0]
+    sys.exit(9)
+  cur = con.cursor()
+  return (con, cur)
+
+def close_db(con, cur):
+  con.commit()
+  cur.close()
+  con.close()
+
+########################################
+# Parse lease file
+# @returns:
+#   list of dicts with
+#     {'ip':    <ip>,
+#      'mac':   <<mac>,
+#      'start': <start>,
+#      'end':   <end>,
+#     }
+def parse_lease_file():
+  import re, sys
+  
+  # lease 10.4.154.93 {
+  #   starts 4 2008/12/04 10:07:00;
+  #   ends 4 2008/12/04 22:07:00;
+  #   tstp 4 2008/12/04 22:07:00;
+  #   binding state free;
+  #   hardware ethernet 00:0d:60:2f:2e:fd;
+  #   uid "\001\000\015`/.\375";
+  # }
+  
+  # important:
+  #   strip newline
+  #   delimiter := "}"
+  lease = re.compile(r""".*
+  lease\ (?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}).*
+  starts\ \d\ (?P<starts>\d{4}/\d{2}/\d{2}\ \d{2}:\d{2}:\d{2}).*
+  ends\ \d\ (?P<ends>\d{4}/\d{2}/\d{2}\ \d{2}:\d{2}:\d{2}).*
+  hardware\ ethernet\ (?P<mac>([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}).*
+  .*""", re.VERBOSE)
+  
+  fd = open(LEASE_FILE, "r")
+  text = fd.read()
+  fd.close()
+  
+  text = text.replace('\n','')
+  textl = text.split('}')
+  
+  ll = []
+  for i in textl:
+    if lease.match(i):
+      m = {'ip':    lease.match(i).group('ip'),
+           'mac':   lease.match(i).group('mac'),
+           'start': lease.match(i).group('starts'),
+           'end':   lease.match(i).group('ends'),
+           }
+      ll.append(m) 
+  return ll
+
+########################################
+# /xmlrpc/presence.php
+def getClientStatus(ip):
+  """
+  Returns the status information of a client.
+  @parameters:
+    ip: string, The IP Address of the client.
+  @returns:
+    If Client is alive:
+      dict: { 'alive':  Bool,   True,
+              'mac':    string, <MAC address of client>,
+            }
+    If Client is not alive/present:
+      dict: { 'status': Bool,   False,
+              'mac':    string, ''
+            }
+  """
+  if ip is None:
+    return { 'status': False, 'mac': '' }
+  for row in parse_lease_file():
+    if row['ip'] == ip:
+      return { 'alive': True, 'mac': row['mac'] }
+  return { 'status': False, 'mac': '' }
+server.register_function(getClientStatus)
+
+########################################
+# /xmlrpc/sessionmanager.php
+def getActiveSessions(handle):
+  """
+  Returns a list of active sessions.
+  @parameters:
+    handle: string, The Authentication Handle (see /xmlrpc/authenticator.php -> login)
+  @returns:
+    array of < TODO >
+  """
+  if not is_auth(handle):
+    return """TODO: Fehlbehandlung:  xmlrpclib.Fault: <Fault 10: 'handle is invalid'>"""
+  # [ { 'profile': 'switch', 
+  #     'end': '1232726400', 
+  #     'presence': 'arp://arp', 
+  #     'address': '130.59.95.247', 
+  #     'start': '1232699825', 
+  #     'mac': '00:21:5D:75:40:2C', 
+  #     'provider': 'switch', 
+  #     'glue': 'username:aai-9 system:mpp ', 
+  #     'type': 'login', 
+  #     'id': '1086' } ] 
+  return "foo"
+server.register_function(getActiveSessions)
+
+def stopSession(handle, address):
+  """
+  Stopps an active sessions.
+  @parameters:
+    handle:  string, The Authentication Handle (see /xmlrpc/authenticator.php -> login)
+    address: string, Address of the Session to stop.
+  @returns:
+    struct of < TODO >
+  """
+  if not is_auth(handle):
+    return "TODO: Fehlbehandlung"
+  return "bar"
+server.register_function(stopSession)
+
+########################################
+def is_auth(handle):
+  """
+  Helperfunction.
+  """
+  import time
+  (con, cur) = open_db()
+  cur.execute("""SELECT username, last_seen 
+      FROM handle
+      WHERE handle = ? AND
+            last_seen >= ?""", (handle, time.time()-(60*5),))
+  if cur.fetchone():
+    cur.execute("""UPDATE handle
+        SET last_seen = ?
+        WHERE handle = ?""", (time.time(), handle,))
+    close_db(con, cur)
+    return True
+  close_db(con, cur)
+  return False
+
+def delete_old_handles():
+  """
+  Helperfunction.
+  """
+  import time
+  (con, cur) = open_db()
+  ret = cur.execute("""DELETE FROM handle
+      WHERE last_seen < ?""", time.time()-(60*5))
+  close_db(con, cur)
+  return ret
+
+########################################
+# /xmlrpc/authenticator.php
+def login(username, password):
+  """
+  Checks user credentials and return and handle on success.
+  @parameters:
+    username: string
+    password: string
+  @returns:
+    string, The Authentication Handle.
+            Empty, if Authentication did not work.
+  """
+  # Until python2.4 use sha, then hashlib
+  import sha, time, random
+  cp = sha.new(password)
+  (con, cur) = open_db()
+  cur.execute("""SELECT username 
+      FROM passwd
+      WHERE username = ? AND 
+            password = ? AND
+            privilege = 'xmlrpc';""", (username, cp.hexdigest(),))
+  handle = ''
+  if cur.fetchone():
+    handle = sha.new(str(random.random())).hexdigest()
+    cur.execute("""INSERT INTO handle
+        (username, handle, last_seen) VALUES
+        (?, ?, ?)""", (username, handle, time.time()))
+  close_db(con, cur)
+  return handle
+server.register_function(login)
+
+def logout(handle):
+  """
+  Destroy handle.
+  @parameters:
+    handle: string, The Authentication Handle.
+  @returns:
+    Bool
+  """
+  (con, cur) = open_db()
+  cur.execute("""DELETE FROM handle
+      WHERE handle = ?""", (handle,))
+  close_db(con, cur)
+  return True
+server.register_function(logout)
+
+def getApiVersion():
+  """
+  Returns the API version number of the XMLRPC-API.
+  @returns:
+    int
+  """
+  return API_VERSION
+
+########################################
+server.serve_forever()
+
