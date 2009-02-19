@@ -1,7 +1,3 @@
-TODO:
-- Make paths in Makefile and files identical (dynamic)
-- Also the user, who runs the webserver (and therefore the database, etc.)
-
 
 Services:
 The services are divided into "packages", but interact.
