@@ -2,28 +2,40 @@
 #  -*- coding: UTF-8 -*-
 # vim: set fileencoding=UTF-8 tabstop=4 shiftwidth=4 expandtab :
 
+# I did not get a secification for the XML-RPC, so the values are "guessed"
+
 # TODO:
-# - get specification for this from the WISPs ...
+# - https ... 
 
 # Config
 import socket
-LISTEN_IP=socket.gethostbyname(socket.getfqdn())
-LISTEN_PORT=1443
-LEASE_FILE="/var/lib/dhcp3/dhcpd.leases"
-DB_FILE='@SHAREDIR@/pwlan.db'
-API_VERSION=0.1
+LISTEN_IP   = socket.gethostbyname(socket.getfqdn())
+LISTEN_PORT = 1443
+LEASE_FILE  = "/var/lib/dhcp3/dhcpd.leases"
+DB_FILE     = '@SHAREDIR@/pwlan.db'
+SSL_PEM     = "@CONFDIR@/ssl.pem"  # private key and cert
+API_VERSION = 0.1
 
-from SimpleXMLRPCServer import SimpleXMLRPCServer
-from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
+from SimpleXMLRPCServer import SimpleXMLRPCServer, SimpleXMLRPCRequestHandler
+
+from SecureXMLRPCServer import SecureXMLRPCServer, SecureXMLRPCRequestHandler
 from pysqlite2 import dbapi2 as sqlite3
 
-class RequestHandler(SimpleXMLRPCRequestHandler):
+### class RequestHandler(SimpleXMLRPCRequestHandler):
+###   rpc_paths = ('/RPC2','/xmlrpc/presence.php',)
+
+class RequestHandler(SecureXMLRPCRequestHandler):
   rpc_paths = ('/RPC2','/xmlrpc/presence.php',)
 
 # Create server
-server = SimpleXMLRPCServer((LISTEN_IP, LISTEN_PORT),
-                             requestHandler=RequestHandler)
-print "Listening on", LISTEN_IP", port", LISTEN_PORT, "..."
+### simple_server = SimpleXMLRPCServer((LISTEN_IP, LISTEN_PORT),
+###                              requestHandler=RequestHandler)
+### ssl_server = SecureSocketServer()
+### server = SecureXMLRPCServer(ssl_server, simple_server) 
+server = SecureXMLRPCServer((LISTEN_IP, LISTEN_PORT), SSL_PEM, SSL_PEM, handler = RequestHandler)
+
+print "Listening on", LISTEN_IP, "port", LISTEN_PORT, "..."
+  
 server.register_introspection_functions()
 
 ########################################
@@ -51,7 +63,7 @@ def close_db(con, cur):
 #      'start': <start>,
 #      'end':   <end>,
 #     }
-def parse_lease_file():
+def parse_lease_file(sorted = None):
   import re, sys
   
   # lease 10.4.154.93 {
@@ -80,16 +92,28 @@ def parse_lease_file():
   text = text.replace('\n','')
   textl = text.split('}')
   
-  ll = []
-  for i in textl:
-    if lease.match(i):
-      m = {'ip':    lease.match(i).group('ip'),
-           'mac':   lease.match(i).group('mac'),
-           'start': lease.match(i).group('starts'),
-           'end':   lease.match(i).group('ends'),
-           }
-      ll.append(m) 
-  return ll
+  if sorted == 'ip':
+    ll = {}
+    for i in textl:
+      if lease.match(i):
+        ip = lease.match(i).group('ip')
+        if not ll.has_key(ip):
+          ll[ip] = {'mac':   lease.match(i).group('mac'),
+                    'start': lease.match(i).group('starts'),
+                    'end':   lease.match(i).group('ends'),
+                   }
+    return ll
+  else:
+    ll = []
+    for i in textl:
+      if lease.match(i):
+        m = {'ip':    lease.match(i).group('ip'),
+             'mac':   lease.match(i).group('mac'),
+             'start': lease.match(i).group('starts'),
+             'end':   lease.match(i).group('ends'),
+            }
+        ll.append(m) 
+    return ll
 
 ########################################
 # /xmlrpc/presence.php
@@ -124,21 +148,49 @@ def getActiveSessions(handle):
   @parameters:
     handle: string, The Authentication Handle (see /xmlrpc/authenticator.php -> login)
   @returns:
-    array of < TODO >
+    array of hashs:
+    [ { 'profile':  'switch',      -- ('switch', 'swisscom', ... )
+        'end':      '1232726400',  -- unix timestamp
+        'presence': 'arp://arp',   -- ??
+        'address':  'a.b.c.d',     -- IPv4 address 
+        'start':    '1232699825',  -- unix timestamp
+        'mac':      'a:b:c:d:e:f', -- MAC address
+        'provider': 'switch',      -- ('switch', 'swisscom', ... )
+        'glue':     '',            -- ??
+        'type':     'login',       -- ('login', 'route', ... )
+        'id':       '1086',        -- integer
+      }, ... ] 
   """
-  if not is_auth(handle):
-    return """TODO: Fehlbehandlung:  xmlrpclib.Fault: <Fault 10: 'handle is invalid'>"""
-  # [ { 'profile': 'switch', 
-  #     'end': '1232726400', 
-  #     'presence': 'arp://arp', 
-  #     'address': '130.59.95.247', 
-  #     'start': '1232699825', 
-  #     'mac': '00:21:5D:75:40:2C', 
-  #     'provider': 'switch', 
-  #     'glue': 'username:aai-9 system:mpp ', 
-  #     'type': 'login', 
-  #     'id': '1086' } ] 
-  return "foo"
+  is_auth(handle)
+
+  leases = parse_lease_file(sorted = 'ip')
+  ret = []
+
+  (con, cur) = open_db()
+  cur.execute("""SELECT a.src_ip, b.name 
+      FROM active_routes a JOIN provider b ON(a.provider_id = b.id);""")
+  for row in cur.fetchall():
+    ip       = row[0]
+    provider = row[1]
+    a = {
+        'profile':  provider,
+        'end':      '',  # None
+        'presence': '',  # None
+        'address':  ip,
+        'start':    '',  # None
+        'mac':      '',  # None
+        'provider': provider,
+        'glue':     '',  # ??
+        'type':     '',  # ??
+        'id':       '',  # None
+      } 
+    if leases.has_key(ip):
+      a['end']   = leases['ip']['end']
+      a['start'] = leases['ip']['start']
+      a['mac']   = leases['ip']['mac']
+    ret.append(a)
+  close_db(con, cur)
+  return ret
 server.register_function(getActiveSessions)
 
 def stopSession(handle, address):
@@ -148,33 +200,36 @@ def stopSession(handle, address):
     handle:  string, The Authentication Handle (see /xmlrpc/authenticator.php -> login)
     address: string, Address of the Session to stop.
   @returns:
-    struct of < TODO >
+    Bool
   """
-  if not is_auth(handle):
-    return "TODO: Fehlbehandlung"
-  return "bar"
+  is_auth(handle)
+  import os
+
+  (con, cur) = open_db()
+  cur.execute("""DELETE FROM active_routes
+      WHERE src_ip = ?""", (address,))
+  # Solange versuchen diese Route zu loeschen, bis es keine mehr in den iptables gibt:
+  # no while loop (is better...)
+  ret = os.system("""
+      count=`sudo /sbin/iptables -t mangle -nv --list PREROUTING | grep " %s " | wc -l`
+      for i in `seq 1 $count`; do
+        a=`sudo /sbin/iptables --line-numbers -t mangle -nv --list PREROUTING | grep " %s " | cut -d" " -f 1 | head -n 1`;
+        [ "$a" ] && sudo /sbin/iptables -t mangle -D PREROUTING $a;
+      done
+    """ % (address, address))
+  close_db(con, cur)
+  return ret
 server.register_function(stopSession)
 
 ########################################
-def is_auth(handle):
-  """
-  Helperfunction.
-  """
-  import time
-  (con, cur) = open_db()
-  cur.execute("""SELECT username, last_seen 
-      FROM handle
-      WHERE handle = ? AND
-            last_seen >= ?""", (handle, time.time()-(60*5),))
-  if cur.fetchone():
-    cur.execute("""UPDATE handle
-        SET last_seen = ?
-        WHERE handle = ?""", (time.time(), handle,))
-    close_db(con, cur)
-    return True
-  close_db(con, cur)
-  return False
+# Exception
+class Fault(Exception):
+  def __init__(self, value):
+    self.value = value
+  def __str__(self):
+    return repr(self.value)
 
+########################################
 def delete_old_handles():
   """
   Helperfunction.
@@ -182,9 +237,29 @@ def delete_old_handles():
   import time
   (con, cur) = open_db()
   ret = cur.execute("""DELETE FROM handle
-      WHERE last_seen < ?""", time.time()-(60*5))
+      WHERE last_seen < ?""", (time.time()-(60*5),))
   close_db(con, cur)
   return ret
+
+def is_auth(handle):
+  """
+  Helperfunction.
+  """
+  delete_old_handles()
+
+  import time
+  (con, cur) = open_db()
+  cur.execute("""SELECT username, last_seen 
+      FROM handle
+      WHERE handle = ?""", (handle,))
+  if cur.fetchone():
+    cur.execute("""UPDATE handle
+        SET last_seen = ?
+        WHERE handle = ?""", (time.time(), handle,))
+    close_db(con, cur)
+    return True
+  close_db(con, cur)
+  raise Fault, 'handle is invalid'
 
 ########################################
 # /xmlrpc/authenticator.php

@@ -49,6 +49,7 @@ install:
 	$(INSTALL) -m 0644 route.php            $(DESTDIR)/$(LIBDIR)/htdocs/route.php 
 	$(INSTALL)                           -d $(DESTDIR)/$(LIBDIR)/server/
 	$(INSTALL) -m 0644 xml-rpc-server.py    $(DESTDIR)/$(LIBDIR)/server/xml-rpc-server.py 
+	$(INSTALL) -m 0644 SecureXMLRPCServer.py  $(DESTDIR)/$(LIBDIR)/server/SecureXMLRPCServer.py
 	$(INSTALL) -m 0755 add-user.py          $(DESTDIR)/$(LIBDIR)/server/add-user.py
 	$(INSTALL) -m 0755 install-db.sh        $(DESTDIR)/$(LIBDIR)/server/install-db.sh
 
