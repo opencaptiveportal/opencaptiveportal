@@ -49,8 +49,8 @@ if row:
   close_db(con, cur)
   sys.exit(9)
 
-ret = cur.execute("""INSERT INTO passwd (username, password, privilege)
+cur.execute("""INSERT INTO passwd (username, password, privilege)
     VALUES (?, ?, ?)""", (username, cp.hexdigest(), privilege,))
 close_db(con, cur)
-sys.exit(ret)
+
 
