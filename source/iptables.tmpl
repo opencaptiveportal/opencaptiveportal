@@ -54,8 +54,7 @@
 
 ## For each WISP one chain:
 #for $wisp in $wisps:
-## -A PREROUTING -m mark --mark 0x$wisp.hexid -j PRE-WISP_$wisp.id
--A PREROUTING -m mark --mark 0x$wisp.hexid -j ACCEPT
+-A PREROUTING -m mark --mark $wisp.hexid -j ACCEPT
 #end for
 
 :SWITCHclassic - [0:0]
@@ -133,8 +132,7 @@ COMMIT
 
 ## For each WISP one chain:
 #for $wisp in $wisps:
-## -A PREROUTING -m mark --mark 0x$wisp.hexid -j PRE-WISP_$wisp.id
--A FORWARD -m mark --mark 0x$wisp.hexid -j ACCEPT
+-A FORWARD -m mark --mark $wisp.hexid -j ACCEPT
 #end for
 
 ## Some special rules ... (why, oh why ?)
