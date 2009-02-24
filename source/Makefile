@@ -1,4 +1,14 @@
 #!/usr/bin/make -f 
+# 
+# +------------------------------------------------+
+# | OpenCaptivePortal                              |
+# |                                                |
+# | For further information please see             |
+# |    http://code.google.com/p/opencaptiveportal/ |
+# | or                                             |
+# |    http://www.switch.ch/mobile/pwlan/          |
+# +------------------------------------------------+
+# 
 
 # ONLY USE TABs IN ACTION LINES!
 # TODO:

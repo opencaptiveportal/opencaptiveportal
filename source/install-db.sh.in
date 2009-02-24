@@ -1,4 +1,14 @@
 #!/bin/sh
+# 
+# +------------------------------------------------+
+# | OpenCaptivePortal                              |
+# |                                                |
+# | For further information please see             |
+# |    http://code.google.com/p/opencaptiveportal/ |
+# | or                                             |
+# |    http://www.switch.ch/mobile/pwlan/          |
+# +------------------------------------------------+
+# 
 
 sudo -u @WWWUSER@ sh -c "cat @CONFDIR@/install-db.tmpl | sqlite3 @SHAREDIR@/pwlan.db"
 
