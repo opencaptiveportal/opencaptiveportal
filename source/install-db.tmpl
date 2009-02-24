@@ -11,12 +11,11 @@
 
 CREATE TABLE active_routes (src_ip inet, provider_id int);
 
-CREATE TABLE provider (id int, name text, gre_tunnel id);
-INSERT INTO provider (id, name, gre_tunnel) VALUES (0, "SWITCHclassic", 0);
-INSERT INTO provider (id, name, gre_tunnel) VALUES (1, "monzoon",       1);
-INSERT INTO provider (id, name, gre_tunnel) VALUES (2, "swisscom",      2);
-INSERT INTO provider (id, name, gre_tunnel) VALUES (3, "tpn",           3);
-INSERT INTO provider (id, name, gre_tunnel) VALUES (4, "thenet",        4);
+CREATE TABLE provider (id int, name text, gre_tunnel id, ip inet);
+INSERT INTO provider (id, name, gre_tunnel) VALUES (1, "monzoon",  1, 172.16.0.1/30);
+INSERT INTO provider (id, name, gre_tunnel) VALUES (2, "swisscom", 2, 172.16.0.5/30);
+INSERT INTO provider (id, name, gre_tunnel) VALUES (3, "tpn",      3, 172.16.0.9/30);
+INSERT INTO provider (id, name, gre_tunnel) VALUES (4, "thenet",   4, 172.16.0.13/30);
 
 CREATE TABLE handle (username string, handle string, last_seen date);
 
