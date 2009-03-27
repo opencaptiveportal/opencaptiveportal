@@ -1,13 +1,21 @@
-landingpage:
-- give_internet fuer konferenz login
-- testen: route.php / back.php
-- listen ip address for xml-rpc from fqdn from ssl cert
+Landingpage:
+- Programm give_internet for Conference Login
+- Get the listen ip address for xml-rpc from fqdn from ssl cert
 
+- install routine
 - (traffic) statistics (-> ntop ?)
 
-- erweitere django um einen ipv6 datentypen oder erweitere den ipv4 datentypen
 
-nice to have:
-- ipv6 faehig
+To test:
+- route.php 
+- back.php
+
+
+Nice to have:
+- IPv6 cabability: The WISPs are maybe not able to offer IPv6 connectivity. In
+  this case we can use teredo. 
+  TODO: 
+  - Django has no IPv6 data type/field -> we have to expand the models.
+  - Document, what is necessary for Teredo. And implement it.
 
 
