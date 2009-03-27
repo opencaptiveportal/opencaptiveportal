@@ -1,0 +1,13 @@
+landingpage:
+- give_internet fuer konferenz login
+- testen: route.php / back.php
+- listen ip address for xml-rpc from fqdn from ssl cert
+
+- (traffic) statistics (-> ntop ?)
+
+- erweitere django um einen ipv6 datentypen oder erweitere den ipv4 datentypen
+
+nice to have:
+- ipv6 faehig
+
+

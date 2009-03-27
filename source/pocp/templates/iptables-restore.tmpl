@@ -1,0 +1,178 @@
+## 
+## +------------------------------------------------+
+## | OpenCaptivePortal                              |
+## |                                                |
+## | For further information please see             |
+## |    http://code.google.com/p/opencaptiveportal/ |
+## | or                                             |
+## |    http://www.switch.ch/mobile/pwlan/          |
+## +------------------------------------------------+
+## 
+## Python cheetah template file for make-iptables.py 
+##
+## TODO:
+## - INPUT Policy DROP
+## 
+## Access to this maschine itself:
+##   - SSH,  Administration
+##   - HTTP, Landingpage
+##   - GRE,  Tunnel zu Anbietern
+##
+## PREROUTING
+##   *mangle                - markieren von verschiedenden WISPs (MARK)
+##   *nat (DNAT)            - MARK -> ignore,
+##           |                SWITCHmobile classic -> ACCEPT,
+##           |                Rest -> DNAT Landingpage
+## Routing/Forwarding       - ip rule: MARK -> GRE Tunnel
+##      /         \  
+##  FORWARD      INPUT
+##  *mangle      *mangle    - ACCEPT
+##  *filter      *filter    - FORWARD: SWITCHmobile classic -> ACCEPT, 
+##      |          |          ggf. WISP spezifische Filter
+##      |        Sockets
+##      |        OUTPUT
+##      |        *mangle
+##      |        *nat
+##      |        *filter
+##      \         /
+##      POSTROUTING
+##      *mangle             - TCPMSS (wegen GRE Tunnel!)
+##      *nat (SNAT)         - ggf. SNAT
+##
+## 
+
+#set $landing_page = '130.59.98.225'
+
+*nat
+:PREROUTING ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0] 
+:OUTPUT ACCEPT [0:0]
+
+## For the Button from Monzoon:
+-A PREROUTING -d 192.168.0.0/16 -p tcp -m tcp --dport 80  -j DNAT --to 130.59.98.225
+-A PREROUTING -d 192.168.0.0/16 -p tcp -m tcp --dport 443 -j DNAT --to 130.59.98.225
+
+## For each WISP one chain:
+#for $wisp in $wisps:
+-A PREROUTING -m mark --mark $wisp.hexid -j ACCEPT
+#end for
+
+:SWITCHclassic - [0:0]
+-A SWITCHclassic -d 138.188.8.5 -p tcp -m tcp --dport 80 -j ACCEPT 
+-A SWITCHclassic -d 138.188.8.5 -p tcp -m tcp --dport 443 -j ACCEPT 
+-A SWITCHclassic -d 10.192.23.20 -j ACCEPT 
+-A SWITCHclassic -d 138.188.108.5 -j ACCEPT 
+-A SWITCHclassic -d 192.33.111.6 -j ACCEPT 
+-A SWITCHclassic -d 193.135.252.147 -j ACCEPT 
+-A SWITCHclassic -d 193.135.252.162 -j ACCEPT 
+-A SWITCHclassic -d 193.247.121.157 -j ACCEPT 
+-A SWITCHclassic -d 193.247.121.114 -j ACCEPT 
+-A SWITCHclassic -d 80.254.79.210 -p tcp -m tcp --dport 80 -j ACCEPT 
+-A SWITCHclassic -d 212.203.91.123 -p tcp -m tcp --dport 80 -j ACCEPT 
+-A SWITCHclassic -d 194.150.245.136 -p tcp -m tcp --dport 80 -j ACCEPT 
+-A SWITCHclassic -d 193.109.53.246 -p tcp -m tcp --dport 80 -j ACCEPT 
+-A SWITCHclassic -d 194.150.245.35 -p tcp -m tcp --dport 80 -j ACCEPT 
+-A SWITCHclassic -d 212.55.205.185 -p tcp -m tcp --dport 80 -j ACCEPT 
+-A SWITCHclassic -d 193.109.53.244 -p tcp -m tcp --dport 80 -j ACCEPT 
+-A SWITCHclassic -d 130.59.138.34 -j ACCEPT 
+-A SWITCHclassic -d 130.59.4.20 -p tcp -m tcp --dport 591 -j ACCEPT 
+-A SWITCHclassic -d 130.59.10.58 -j ACCEPT 
+-A SWITCHclassic -d 130.59.108.53 -j ACCEPT 
+-A SWITCHclassic -d 130.59.108.36 -j ACCEPT 
+-A SWITCHclassic -d 130.59.104.8 -p tcp -m tcp --dport 22 -j ACCEPT 
+-A SWITCHclassic -d 130.59.13.14 -p tcp -m tcp --dport 22 -j ACCEPT 
+-A SWITCHclassic -d 130.59.10.51 -j ACCEPT 
+-A SWITCHclassic -s 130.59.95.31 -j ACCEPT 
+
+## The SWITCH classic ACLs (see http://www.switch.ch/mobile/classic/)
+#for ($ace, $desc) in $classic_acls:
+-A SWITCHclassic -d $ace -j ACCEPT
+#end for
+
+-A SWITCHclassic -p tcp -m tcp --dport 80  -j DNAT --to-destination $landing_page
+-A SWITCHclassic -p tcp -m tcp --dport 443 -j DNAT --to-destination $landing_page
+-A SWITCHclassic -j LOG
+
+## allow DNS
+-A PREROUTING -p udp -m udp --dport 53 -j ACCEPT
+-A PREROUTING -j SWITCHclassic
+
+
+COMMIT
+
+
+*mangle
+:PREROUTING  ACCEPT [0:0] 
+:INPUT       ACCEPT [0:0]
+:FORWARD     ACCEPT [0:0]
+:OUTPUT      ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+
+## Once again, allow DNS Server (?)
+-A PREROUTING -d 130.59.31.248 -j ACCEPT
+-A PREROUTING -d 130.59.31.251 -j ACCEPT
+
+## Set Mark for active sessions (saved in DB)
+#for ($ip, $hexid) in $active_session:
+-A POSTROUTING -s $ip -j MARK --set-mark $hexid
+#end for
+
+## TCPMSS, important because of GRE tunnels
+-A POSTROUTING -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+
+COMMIT
+
+
+*filter
+:INPUT   ACCEPT [0:0]  ## TODO: Policy DROP :)
+:FORWARD DROP   [0:0] 
+:OUTPUT  ACCEPT [0:0]
+
+-A FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+## For each WISP one chain:
+#for $wisp in $wisps:
+-A FORWARD -m mark --mark $wisp.hexid -j ACCEPT
+#end for
+
+## Some special rules ... (why, oh why ?)
+:SWITCHclassic - [0:0]
+-A SWITCHclassic -d 138.188.8.5 -p tcp -m tcp --dport 80 -j ACCEPT 
+-A SWITCHclassic -d 138.188.8.5 -p tcp -m tcp --dport 443 -j ACCEPT 
+-A SWITCHclassic -d 10.192.23.20 -j ACCEPT 
+-A SWITCHclassic -d 138.188.108.5 -j ACCEPT 
+-A SWITCHclassic -d 192.33.111.6 -j ACCEPT 
+-A SWITCHclassic -d 193.135.252.147 -j ACCEPT 
+-A SWITCHclassic -d 193.135.252.162 -j ACCEPT 
+-A SWITCHclassic -d 193.247.121.157 -j ACCEPT 
+-A SWITCHclassic -d 193.247.121.114 -j ACCEPT 
+-A SWITCHclassic -d 80.254.79.210 -p tcp -m tcp --dport 80 -j ACCEPT 
+-A SWITCHclassic -d 212.203.91.123 -p tcp -m tcp --dport 80 -j ACCEPT 
+-A SWITCHclassic -d 194.150.245.136 -p tcp -m tcp --dport 80 -j ACCEPT 
+-A SWITCHclassic -d 193.109.53.246 -p tcp -m tcp --dport 80 -j ACCEPT 
+-A SWITCHclassic -d 194.150.245.35 -p tcp -m tcp --dport 80 -j ACCEPT 
+-A SWITCHclassic -d 212.55.205.185 -p tcp -m tcp --dport 80 -j ACCEPT 
+-A SWITCHclassic -d 193.109.53.244 -p tcp -m tcp --dport 80 -j ACCEPT 
+-A SWITCHclassic -d 130.59.138.34 -j ACCEPT 
+-A SWITCHclassic -d 130.59.4.20 -p tcp -m tcp --dport 591 -j ACCEPT 
+-A SWITCHclassic -d 130.59.10.58 -j ACCEPT 
+-A SWITCHclassic -d 130.59.108.53 -j ACCEPT 
+-A SWITCHclassic -d 130.59.108.36 -j ACCEPT 
+-A SWITCHclassic -d 130.59.104.8 -p tcp -m tcp --dport 22 -j ACCEPT 
+-A SWITCHclassic -d 130.59.13.14 -p tcp -m tcp --dport 22 -j ACCEPT 
+-A SWITCHclassic -d 130.59.10.51 -j ACCEPT 
+-A SWITCHclassic -s 130.59.95.31 -j ACCEPT 
+
+## The SWITCH classic ACLs (see http://www.switch.ch/mobile/classic/)
+#for ($ace, $desc) in $classic_acls:
+-A SWITCHclassic -d $ace -j ACCEPT
+#end for
+
+-A SWITCHclassic -j LOG
+
+## allow DNS again
+-A FORWARD -p udp -m udp --dport 53 -j ACCEPT
+-A FORWARD -j SWITCHclassic
+
+
+COMMIT
