@@ -77,16 +77,41 @@ def make_iptables(tmp_file = None):
   iptables_restore = render_to_string(IPTABLES_TMP_FILE, 
           { 'wisps':           wisps,
             'active_session':  active_sessions,
-            'classic_acls':    classic_acls,
-          } )
+            'classic_acls':    fetch_switch_classic(),
+            'landing_page':    '130.59.98.225',
+          } ).encode("utf-8")
 
   # Debug
   if tmp_file:
     fp = open(tmp_file, 'w')
     fp.write(iptables_restore)
     fp.close()
-  return os.system("""
-      echo "%s" | /usr/bin/sudo /sbin/iptables-restore""" % iptables_restore ) 
+  import subprocess
+  return subprocess.Popen(["""echo "%s" | /usr/bin/sudo /sbin/iptables-restore; echo "%s" """ % (iptables_restore, iptables_restore)],
+        shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+def show_iptables():
+  """
+  Show live iptables
+  """
+  import subprocess
+  out = ""
+  out += "\n* iptables -t mangle \n"
+  out += subprocess.Popen(["/usr/bin/sudo /sbin/iptables --list -nv -t mangle"], 
+        shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE).stdout.read()
+  out += "\n* iptables -t nat \n"
+  out += subprocess.Popen(["/usr/bin/sudo /sbin/iptables --list -nv -t nat"], 
+        shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE).stdout.read()
+  out += "\n* iptables -t filter \n"
+  out += subprocess.Popen(["/usr/bin/sudo /sbin/iptables --list -nv -t filter"], 
+        shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE).stdout.read()
+  out += "\n* ip6tables -t mangle \n"
+  out += subprocess.Popen(["/usr/bin/sudo /sbin/ip6tables --list -nv -t mangle"], 
+        shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE).stdout.read()
+  out += "\n* ip6tables -t mangle \n"
+  out += subprocess.Popen(["/usr/bin/sudo /sbin/ip6tables --list -nv -t filter"], 
+        shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE).stdout.read()
+  return out
 
 
 def make_gre_tunnel(id = None):
@@ -137,7 +162,7 @@ def fetch_switch_classic(url = SWITCHclassic_url):
   import urllib2
   # SWITCHclassis ACLs holen
   opener = urllib2.build_opener()
-  acls_raw = opener.open(acl_url)
+  acls_raw = opener.open(SWITCHclassic_url)
   acls_raw = acls_raw.readlines()
   classic_acls = []
   for line in acls_raw:

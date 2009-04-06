@@ -9,6 +9,20 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.forms import AuthenticationForm
 
+## IMPORTANT TODO
+## The admin stuff is very alpha, e.g. there is no real auth, CHECK THAT bevor commit !!1!
+def admin(request):
+  """
+  Overview for the Administrators
+  """
+  loggedin = False
+  if str(request.user) != "AnonymousUser":
+    loggedin = True
+  return render_to_response('admin.htm', {
+      'username': request.user,
+      'loggedin': loggedin,
+    })
+
 def landingpage(request):
   """
   Show the Landingpage"

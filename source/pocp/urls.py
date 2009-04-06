@@ -17,6 +17,12 @@ urlpatterns = patterns('',
     (r'^route.php', 'pocp.ocp.views.route'),
     (r'^index.php', 'pocp.ocp.views.landingpage'),
 
+    (r'^service/iptables/show',    'pocp.ocp.view_iptables.show'),
+    (r'^service/iptables/rebuild', 'pocp.ocp.view_iptables.rebuild'),
+    
+    
+    (r'^admin-overview/', 'pocp.ocp.views.admin'),
+
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:

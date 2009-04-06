@@ -1,3 +1,5 @@
+##  -*- coding: UTF-8 -*-
+## vim: set fileencoding=UTF-8 :
 ## 
 ## +------------------------------------------------+
 ## | OpenCaptivePortal                              |
@@ -41,8 +43,6 @@
 ##
 ## 
 
-#set $landing_page = '130.59.98.225'
-
 *nat
 :PREROUTING ACCEPT [0:0]
 :POSTROUTING ACCEPT [0:0] 
@@ -53,9 +53,9 @@
 -A PREROUTING -d 192.168.0.0/16 -p tcp -m tcp --dport 443 -j DNAT --to 130.59.98.225
 
 ## For each WISP one chain:
-#for $wisp in $wisps:
--A PREROUTING -m mark --mark $wisp.hexid -j ACCEPT
-#end for
+{% for wisp in wisps %}
+-A PREROUTING -m mark --mark {{ wisp.hexid }} -j ACCEPT
+{% endfor %}
 
 :SWITCHclassic - [0:0]
 -A SWITCHclassic -d 138.188.8.5 -p tcp -m tcp --dport 80 -j ACCEPT 
@@ -85,12 +85,12 @@
 -A SWITCHclassic -s 130.59.95.31 -j ACCEPT 
 
 ## The SWITCH classic ACLs (see http://www.switch.ch/mobile/classic/)
-#for ($ace, $desc) in $classic_acls:
--A SWITCHclassic -d $ace -j ACCEPT
-#end for
+{% for ace, desc in classic_acls %}
+-A SWITCHclassic -d {{ ace }} -j ACCEPT
+{% endfor %}
 
--A SWITCHclassic -p tcp -m tcp --dport 80  -j DNAT --to-destination $landing_page
--A SWITCHclassic -p tcp -m tcp --dport 443 -j DNAT --to-destination $landing_page
+-A SWITCHclassic -p tcp -m tcp --dport 80  -j DNAT --to-destination {{ landing_page }}
+-A SWITCHclassic -p tcp -m tcp --dport 443 -j DNAT --to-destination {{ landing_page }}
 -A SWITCHclassic -j LOG
 
 ## allow DNS
@@ -109,13 +109,13 @@ COMMIT
 :POSTROUTING ACCEPT [0:0]
 
 ## Once again, allow DNS Server (?)
--A PREROUTING -d 130.59.31.248 -j ACCEPT
--A PREROUTING -d 130.59.31.251 -j ACCEPT
+##-A PREROUTING -d 130.59.31.248 -j ACCEPT
+##-A PREROUTING -d 130.59.31.251 -j ACCEPT
 
 ## Set Mark for active sessions (saved in DB)
-#for ($ip, $hexid) in $active_session:
--A POSTROUTING -s $ip -j MARK --set-mark $hexid
-#end for
+{% for (ip, hexid) in active_session %}
+-A POSTROUTING -s {{ ip }} -j MARK --set-mark {{ hexid }}
+{% endfor %}
 
 ## TCPMSS, important because of GRE tunnels
 -A POSTROUTING -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
@@ -131,9 +131,9 @@ COMMIT
 -A FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
 
 ## For each WISP one chain:
-#for $wisp in $wisps:
--A FORWARD -m mark --mark $wisp.hexid -j ACCEPT
-#end for
+{% for wisp in wisps %}
+-A FORWARD -m mark --mark {{ wisp.hexid }} -j ACCEPT
+{% endfor %}
 
 ## Some special rules ... (why, oh why ?)
 :SWITCHclassic - [0:0]
@@ -164,13 +164,15 @@ COMMIT
 -A SWITCHclassic -s 130.59.95.31 -j ACCEPT 
 
 ## The SWITCH classic ACLs (see http://www.switch.ch/mobile/classic/)
-#for ($ace, $desc) in $classic_acls:
--A SWITCHclassic -d $ace -j ACCEPT
-#end for
+{% for ace, desc in classic_acls %}
+-A SWITCHclassic -d {{ ace }} -j ACCEPT
+{% endfor %}
 
 -A SWITCHclassic -j LOG
 
 ## allow DNS again
+## Checken, dass die folgende rule funktioniert (e.g., is there -o  lo set and is it in *nat:forward)
+-A FORWARD -o lo -j ACCEPT
 -A FORWARD -p udp -m udp --dport 53 -j ACCEPT
 -A FORWARD -j SWITCHclassic
 
