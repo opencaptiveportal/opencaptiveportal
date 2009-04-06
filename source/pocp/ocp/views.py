@@ -27,6 +27,17 @@ def landingpage(request):
   """
   Show the Landingpage"
   """
+  print request.META['HTTP_USER_AGENT']
+  # Anderer User-Agent, goto iPass oder aehnloich
+  if request.META.has_key('HTTP_USER_AGENT'):
+    if request.META['HTTP_USER_AGENT'] == 'iPassConnect':
+      # TODO: Round Robin for WISP
+      wisp = 'swisscom'
+      print "gethost", request.get_host()
+      return render_to_response('ipass.htm', {
+            'wisp': wisp,
+        })
+
   # Von django.contrib.auth.views, login:
   redirect_to = '/'
   loggedin = False
