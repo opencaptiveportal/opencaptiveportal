@@ -5,6 +5,7 @@ Landingpage:
 - install routine
 - (traffic) statistics (-> ntop ?)
 
+- https machen !!1!
 
 To test:
 - route.php 
@@ -17,5 +18,4 @@ Nice to have:
   TODO: 
   - Django has no IPv6 data type/field -> we have to expand the models.
   - Document, what is necessary for Teredo. And implement it.
-
 

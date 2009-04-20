@@ -1,0 +1,7 @@
+
+Some shell scripts to start and stop the necessary daemons and/or other things
+like iptables.
+
+
+sudo sh -c 'DJANGO_SETTINGS_MODULE="pocp.settings" ./iptables-restore.py '
+

@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# only as lisa executable
+if [ $UID != 0 ]; then
+  echo "Error: $0 must be executed as user root!"
+  exit 2
+fi
+
+start () {
+#  PYTHONPATH=/home/kleefass/pocp/ \
+#      /usr/local/selfnet/lisa-2.0/scripts/swing/session_delete_all.py
+  mkdir -p           /tmp/landingpage/
+  chown -R www-data: /tmp/landingpage/
+  mkdir -p           /var/www/fast_cgi/
+  chown -R www-data: /var/www/fast_cgi/
+  cd /home/kleefass/pocp/
+  sudo -u www-data python ./manage.py runfcgi method=prefork \
+      socket=/var/www/fast_cgi/mysite.sock \
+      pidfile=/var/www/fast_cgi/django.pid
+  # check, dass das geht:
+  if [ "`ps aux | grep "python ./manage.py runfcgi method=prefork" | \
+          grep -v "grep python" | wc -l`" -gt 0 ]; then
+    echo "                                                  [ done ]"
+  else
+    echo "                                                  [*fail*]"
+  fi
+}
+
+stop () {
+  kill `cat /var/www/fast_cgi/django.pid` || \
+      ps aux | grep "python ./manage.py runfcgi method=prefork" | \
+      perl -p -i -e 's#[\ ]+# #g' | cut -d " " -f 2 | \
+      perl -p -i -e 's#\n# #g' | xargs kill -9
+  echo "                                                  [ done ]"
+}
+
+
+if [ "$1" == "start" ]; then
+  echo -n "Starting landingpage ...   "
+  start
+elif [ "$1" == "stop" ]; then
+  echo -n "Stopping landingpage ...   "
+  stop
+elif [ "$1" == "restart" ]; then
+  echo -n "Restarting landingpage ... "
+  stop || true
+  sleep 1
+  start
+else 
+  echo "Usage: $0 [ start | stop | restart ]"
+fi
+

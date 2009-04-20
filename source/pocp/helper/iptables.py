@@ -26,10 +26,10 @@ def insert_route(src_ip, gre_tunnel):
   import os
   try:
     os.system("""
-        /usr/bin/sudo /sbin/iptables -t mangle -A PREROUTING -s %s -j MARK --set-mark %i
+        /usr/bin/sudo /sbin/iptables -t mangle -A PREROUTING -s %s -j MARK --set-mark %s
       """ % (src_ip, gre_tunnel))
   except:
-    raise iptExc("Could not insert route from src_ip %s to gre tunnel %i in iptables" % (src_ip, gre_tunnel))
+    raise iptExc("Could not insert route from src_ip %s to gre tunnel %s in iptables" % (src_ip, gre_tunnel))
 
 def delete_route(src_ip):
   """
@@ -38,7 +38,7 @@ def delete_route(src_ip):
   import os
   # no while loop (is better...)
   try:
-    os.system("""
+    print os.system("""
         count=`/usr/bin/sudo /sbin/iptables -t mangle -nv --list PREROUTING | grep " %s " | wc -l`
         for i in `seq 1 $count`; do
           a=`/usr/bin/sudo /sbin/iptables --line-numbers -t mangle -nv --list PREROUTING | grep " %s " | cut -d" " -f 1 | head -n 1`;
@@ -47,6 +47,7 @@ def delete_route(src_ip):
       """ % (src_ip, src_ip))
   except:
     raise iptExc("Could not delete route from src_ip %s in iptables" % (src_ip))
+  return True
     
 
 def make_iptables(tmp_file = None):

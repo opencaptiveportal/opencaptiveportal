@@ -49,8 +49,8 @@
 :OUTPUT ACCEPT [0:0]
 
 ## For the Button from Monzoon:
--A PREROUTING -d 192.168.0.0/16 -p tcp -m tcp --dport 80  -j DNAT --to 130.59.98.225
--A PREROUTING -d 192.168.0.0/16 -p tcp -m tcp --dport 443 -j DNAT --to 130.59.98.225
+-A PREROUTING -d 192.168.0.0/16 -p tcp -m tcp --dport 80  -j DNAT --to 130.59.98.225:80
+-A PREROUTING -d 192.168.0.0/16 -p tcp -m tcp --dport 443 -j DNAT --to 130.59.98.225:443
 
 ## For each WISP one chain:
 {% for wisp in wisps %}
@@ -110,8 +110,9 @@ COMMIT
 :POSTROUTING ACCEPT [0:0]
 
 ## Once again, allow DNS Server (?)
--A PREROUTING -d 130.59.31.248 -j ACCEPT
--A PREROUTING -d 130.59.31.251 -j ACCEPT
+## DNS is now a locale cache
+## -A PREROUTING -d 130.59.31.248 -j ACCEPT
+## -A PREROUTING -d 130.59.31.251 -j ACCEPT
 
 ## Set Mark for active sessions (saved in DB)
 {% for (ip, hexid) in active_session %}
@@ -174,8 +175,8 @@ COMMIT
 ## allow DNS again
 ## Checken, dass die folgende rule funktioniert (e.g., is there -o  lo set and is it in *nat:forward)
 -A FORWARD -o lo -j ACCEPT
--A FORWARD -p udp -m udp --dport 53 -j ACCEPT
--A FORWARD -p tcp -m tcp --dport 53 -j ACCEPT
+## -A FORWARD -p udp -m udp --dport 53 -j ACCEPT
+## -A FORWARD -p tcp -m tcp --dport 53 -j ACCEPT
 -A FORWARD -j SWITCHclassic
 
 

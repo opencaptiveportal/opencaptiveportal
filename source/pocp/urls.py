@@ -16,6 +16,11 @@ urlpatterns = patterns('',
     (r'^back.php',  'pocp.ocp.views.back'),
     (r'^route.php', 'pocp.ocp.views.route'),
     (r'^index.php', 'pocp.ocp.views.landingpage'),
+    # TODO: Dumme Fehler wie dieses / am Anfang abfangen:
+    (r'^/route.php', 'pocp.ocp.views.route'),
+    (r'^pwlan/back.php',  'pocp.ocp.views.back'),
+    (r'^pwlan/route.php', 'pocp.ocp.views.route'),
+    (r'^pwlan/index.php', 'pocp.ocp.views.landingpage'),
 
     (r'^service/iptables/show',    'pocp.ocp.view_iptables.show'),
     (r'^service/iptables/rebuild', 'pocp.ocp.view_iptables.rebuild'),

@@ -17,8 +17,21 @@ class active_route(models.Model):
         list_display  = ('src_ip', 'provider')
         search_fields = ['src_ip']
 
+    def save(self, force_insert=False, force_update=False):
+        from pocp.helper.iptables import insert_route
+        # Insert route in iptables, if fail -> exception
+        insert_route(self.src_ip, str(self.provider.gre_tunnel))
+        super(active_route, self).save(force_insert, force_update) # Call the "real" save() method.
+
+    def delete(self):
+        from pocp.helper.iptables import delete_route
+        # and then in iptables
+        delete_route(self.src_ip)
+        super(active_route, self).delete() # Call the "real" save() method.
+
+
 class provider(models.Model):
-    name        = models.CharField(max_length=255)
+    name        = models.CharField(max_length=255, unique=True)
     gre_tunnel  = models.IntegerField()
     local_ipv4  = models.IPAddressField()   # GRE tunnel endpoints
     remote_ipv4 = models.IPAddressField()
