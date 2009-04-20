@@ -28,7 +28,7 @@ def landingpage(request):
   """
   Show the Landingpage"
   """
-  print request.META['HTTP_USER_AGENT']
+  #DEBUG print request.META['HTTP_USER_AGENT']
   # Anderer User-Agent, goto iPass oder aehnloich
   if request.META.has_key('HTTP_USER_AGENT'):
     if request.META['HTTP_USER_AGENT'] == 'iPassConnect':
@@ -51,10 +51,11 @@ def landingpage(request):
       a = active_route(src_ip = src_ip, provider = prov)
       a.save()
 
-      print  render_to_response('ipass.htm', {
-            'site': "https://zrh1-as13.monzoon.net",
-            'url':  url,
-        })
+      # DEBUG
+      # print  render_to_response('ipass.htm', {
+      #       'site': "https://zrh1-as13.monzoon.net",
+      #       'url':  url,
+      #   })
       return render_to_response('ipass.htm', {
             'site': "https://zrh1-as13.monzoon.net",
             'url':  url,
