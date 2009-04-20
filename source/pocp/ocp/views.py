@@ -4,8 +4,6 @@
 
 # Create your views here.
 
-from pocp.ocp.models import provider, active_route
-from pocp.helper.iptables import insert_route, delete_route
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.forms import AuthenticationForm
@@ -24,42 +22,34 @@ def admin(request):
       'loggedin': loggedin,
     })
 
+def add_active_route(src_ip, prov):
+  from pocp.ocp.models import provider, active_route
+  if type(prov) in (unicode, str):
+      prov = provider.objects.get(name = prov)
+  # Delete existing active_route to src_ip, just to be sure
+  try:
+    a = active_route.objects.get(src_ip = src_ip)
+    a.delete()
+  except:
+    pass
+  # And save new route 
+  a = active_route(src_ip = src_ip, prov = prov)
+  return a.save()
+
 def landingpage(request):
   """
   Show the Landingpage"
   """
   #DEBUG print request.META['HTTP_USER_AGENT']
-  # Anderer User-Agent, goto iPass oder aehnloich
+  # User-Agent iPass / iPassConnect
   if request.META.has_key('HTTP_USER_AGENT'):
     if request.META['HTTP_USER_AGENT'] == 'iPassConnect':
       src_ip  = request.META['REMOTE_ADDR']
       # TODO: Round Robin for WISP
-      prov    = 'monzoon'
-      url     = "http://www.yahoo.com/"
-
-      # If no provider with prov exists, an exception will be raised
-      prov = provider.objects.get(name = prov)
-
-      # Delete existing active_route to src_ip, just to be sure
-      try:
-        a = active_route.objects.get(src_ip = src_ip)
-        a.delete()
-      except:
-        pass
-
-      # And save new route 
-      a = active_route(src_ip = src_ip, provider = prov)
-      a.save()
-
-      # DEBUG
-      # print  render_to_response('ipass.htm', {
-      #       'site': "https://zrh1-as13.monzoon.net",
-      #       'url':  url,
-      #   })
-      return render_to_response('ipass.htm', {
-            'site': "https://zrh1-as13.monzoon.net",
-            'url':  url,
-        })
+      prov = 'monzoon'
+      # Add and save new route
+      add_active_route(src_ip = src_ip, prov = prov)
+      return render_to_response('ipass.htm', {})
   # /iPass
 
   # Von django.contrib.auth.views, login:
@@ -104,11 +94,11 @@ def landingpage(request):
       'url':      url,
     })
 
+
 def route(self):
   """
   Add a route for src_ip to Provider with provider
   """
-  from pocp.ocp.models import provider, active_route
   # TODO: wenn keine url, herausfinden, welche ????
   # TODO: wenn url = hostname (fqdn), dann -> google.ch
   if not (self.META.has_key('REMOTE_ADDR') and 
@@ -119,30 +109,13 @@ def route(self):
     return render_to_response('error.htm', {
         'error': "Falsche Parameter auf route.php",
       })
-  src_ip  = self.META['REMOTE_ADDR']
-  prov    = self.GET['provider']
-  url     = "http://www.google.ch"
+  src_ip = self.META['REMOTE_ADDR']
+  prov   = self.GET['provider']
+  url    = "http://www.google.ch"
   if self.GET.has_key('url'):
     url   = self.GET['url']
-
-  # If no provider with prov exists, an exception will be raised
-  prov = provider.objects.get(name = prov)
-
-###  # Insert route in iptables, if fail -> exception
-###  insert_route(src_ip, str(prov.gre_tunnel))
-
-  # Delete existing active_route to src_ip, just to be sure
-  try:
-    a = active_route.objects.get(src_ip = src_ip)
-    a.delete()
-  #except active_route.DoesNotExist:
-  except:
-    pass
-
-  # And save new route 
-  a = active_route(src_ip = src_ip, provider = prov)
-  a.save()
-
+  # Add and save new route
+  add_active_route(src_ip = src_ip, prov = prov)
   return HttpResponseRedirect(url)
 
 
@@ -153,7 +126,6 @@ def back(self):
   from pocp.ocp.models import active_route
 
   if not (self.META.has_key('REMOTE_ADDR')):
-    #return HttpResponseRedirect('/index.php')
     return render_to_response('error.htm', {
         'error': "Falsche Parameter auf back.php",
       })
@@ -167,11 +139,5 @@ def back(self):
   except active_route.DoesNotExist:
     pass
 
-###  # and then in iptables
-###  delete_route(src_ip)
-
-  #return render_to_response('error.htm', {
-  #    'error': "fertig mit back.php",
-  #  })
   return HttpResponseRedirect('/index.php')
 
