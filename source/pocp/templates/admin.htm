@@ -20,6 +20,29 @@
  </head>
 <body bgcolor="#ffffff" topmargin="0" leftmargin="0" marginwidth="0" marginheight="0">
 
+<!-- start header -->
+<table bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" width="780">
+ <tr>
+  <td colspan="6"><img src="http://www.switch.ch/switch-web/images/head_spacer.gif" name="head_spacer" width="740" height="20" border="0" alt=""></td>
+ </tr>
+ <tr>
+  <td colspan="6"><a href="http://www.switch.ch/"><img src="http://www.switch.ch/switch-web/images/start_switch_logo.gif" name="head_switch_logo" height="63" border="0" alt="SWITCH Logo"></a></td>
+ </tr>
+ <tr>
+  <td colspan="6"><img src="http://www.switch.ch/switch-web/images/head_stripes.gif" name="head_stripes" width="780" height="15" border="0" alt=""></td>
+ <tr>
+  <td colspan="6"><img src="http://www.switch.ch/switch-web/images/head_colorgradient.jpg" name="head_colorgradient" width="780" height="10" border="0" alt=""></td>
+ </tr>
+</table>
+
+<!-- Contenc -->
+<table bgcolor="#ffffff" border="0" cellpadding="5" cellspacing="5" width="1040">
+ <tr>
+  <th colspan="4" align="left"><h1>Administration</h1></th>
+ </tr> 
+ <tr>
+  <td colspan="4">
+
 {% if no_cookies %}
 <p style="color: red;">Dein Browser unterstützt keine Cookies. Bitte aktivere sie um dich anzumelden.</p>
 {% endif %}
@@ -29,31 +52,40 @@
 {% endif %}
 
 {% if loggedin %}
-<p>You are logged in as {{ username }}.</p>
 <p>
-SWITCH - Hotspot Frontpage: <a href="/">Frontpage</a><br /><br />
-Django Admin Webinterface: <a href="/admin/">/admin/</a><br /><br />
-Services: <br />
-&nbsp; &nbsp; - iptables <a href="/service/iptables/show">show</a>, <a href="/service/iptables/rebuild">rebuild</a><br /><br />
+<form method="post" action="/">
+ You are logged in as {{ username }}.
+ <input type="submit" value="logout" />
+</form>
+</p>
+<p>
+<h2>Documentation</h2>
+ <ul>
+  <li> Project on <a href="http://code.google.com/p/opencaptiveportal/">google code</a> </li>
+ </ul>
+
+<h2>Overview</h2>
+ <ul>
+  <li> SWITCH Hotspot <a href="/">frontpage</a> </li>
+  <li> Django <a href="/admin/">admin webinterface</a> </li>
+ </ul>
+
+<h2>Services</h2>
+ <h3>iptables</h3>
+  <ul>
+   <li> <a href="/service/iptables/show">show</a> </li>
+   <li> <a href="/service/iptables/rebuild">rebuild</a> </li>
+  </ul>
+<br /><br />
 </p>
 
-
-
-<!-- <input type="submit" value="logout" /> -->
 {% else %}
-<form method="post" action=".">
-<table border="0">
- <tr><td>Username:</td><td>{{ form.username }}</td></tr>
- <tr><td>Password:</td><td>{{ form.password }}</td></tr>
-</table>
-<input type="hidden" name="give_internet" value="true" />
-<input type="submit" value="login" />
-</form>
+<p><a href="/">Login</a> on Fronpage.</a>
 {% endif %}
 
 
-
-
-
+  </td>
+ </tr>
+</table>
 
 </body>
