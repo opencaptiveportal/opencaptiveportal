@@ -115,7 +115,7 @@ COMMIT
 ## -A PREROUTING -d 130.59.31.251 -j ACCEPT
 
 ## Set Mark for active sessions (saved in DB)
-{% for (ip, hexid) in active_session %}
+{% for ip, hexid in active_session %}
 -A POSTROUTING -s {{ ip }} -j MARK --set-mark {{ hexid }}
 {% endfor %}
 
