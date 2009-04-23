@@ -30,6 +30,8 @@ def insert_route(src_ip, gre_tunnel):
       """ % (src_ip, gre_tunnel))
   except:
     raise iptExc("Could not insert route from src_ip %s to gre tunnel %s in iptables" % (src_ip, gre_tunnel))
+  return True
+
 
 def delete_route(src_ip):
   """
@@ -72,7 +74,7 @@ def make_iptables(tmp_file = None):
   # get active routes
   active_sessions = []
   for p in active_route.objects.all():
-    active_sessions.append( [ p.src_ip, p.provider.gre_tunnel ] )
+    active_sessions.append( ( p.src_ip, p.provider.gre_tunnel ) )
 
   # replace variables in template file
   iptables_restore = render_to_string(IPTABLES_TMP_FILE, 
