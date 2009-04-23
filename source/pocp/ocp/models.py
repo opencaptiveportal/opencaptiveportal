@@ -74,13 +74,13 @@ class provider(models.Model):
 # SWITCHclassic ACLs holen
 class round_robin(models.Model):
     provider    = models.ForeignKey('provider', unique=True)
-    prozent     = models.FloatField()   # TODO: check, that prozent in [0,1] and sum(prozent) = 1
+    rate        = models.FloatField()   # TODO: check, that rate in [0,1] and sum(rate) = 1
 
     def __str__(self):
-        return str("%s (%s)" % (self.provider.name, self.prozent))
+        return str("%0.2f (%02.f%%) %s" % (self.rate, self.rate*100, self.provider.name))
 
     class Admin:
-        list_display  = ('provider', 'prozent')
+        list_display  = ('provider', 'rate')
         search_fields = ['provider']
 
 

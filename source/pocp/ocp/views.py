@@ -56,10 +56,10 @@ def landingpage(request):
       r = random()
       last = 0
       for o in round_robin.objects.all():
-        if r <= o.prozent + last:
+        if r <= o.rate + last:
           e = o
           break
-        last += o.prozent
+        last += o.rate
       prov = e
       # Add and save new route
       add_active_route(src_ip = src_ip, prov = prov)
