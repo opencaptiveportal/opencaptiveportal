@@ -22,10 +22,15 @@ def admin(request):
       'loggedin': loggedin,
     })
 
-def add_active_route(src_ip, prov):
+def add_active_route(src_ip, prov = None, conf = False):
   from pocp.ocp.models import provider, active_route
-  if type(prov) in (unicode, str):
-      prov = provider.objects.get(name = prov)
+  if not conf and prov is None:
+    return False
+  if conf:
+    from settings import GRE_TUNNEL_CONF
+    prov = provider.objects.get(gre_tunnel = GRE_TUNNEL_CONF)
+  elif type(prov) in (unicode, str):
+    prov = provider.objects.get(name = prov)
   # Delete existing active_route to src_ip, just to be sure
   try:
     a = active_route.objects.get(src_ip = src_ip)
@@ -33,7 +38,7 @@ def add_active_route(src_ip, prov):
   except:
     pass
   # And save new route 
-  a = active_route(src_ip = src_ip, prov = prov)
+  a = active_route(src_ip = src_ip, provider = prov)
   return a.save()
 
 def landingpage(request):
@@ -45,8 +50,17 @@ def landingpage(request):
   if request.META.has_key('HTTP_USER_AGENT'):
     if request.META['HTTP_USER_AGENT'] == 'iPassConnect':
       src_ip  = request.META['REMOTE_ADDR']
-      # TODO: Round Robin for WISP
-      prov = 'monzoon'
+      # Round Robin for WISP
+      from random import random
+      from pocp.ocp.models import round_robin
+      r = random()
+      last = 0
+      for o in round_robin.objects.all():
+        if r <= o.prozent + last:
+          e = o
+          break
+        last += o.prozent
+      prov = e
       # Add and save new route
       add_active_route(src_ip = src_ip, prov = prov)
       return render_to_response('ipass.htm', {})
@@ -73,8 +87,11 @@ def landingpage(request):
       # i.e. admin login)
       give_internet = request.POST.get('give_internet','0')
       if give_internet:
-        # TODO: Mach hier was, damit das geht geht :)
-        pass
+        try:
+          src_ip  = request.META['REMOTE_ADDR']
+          add_active_route(src_ip = src_ip, prov = None, conf = True)
+        except:
+          pass
       if request.session.test_cookie_worked():
         request.session.delete_test_cookie()
       return HttpResponseRedirect(redirect_to)
@@ -130,7 +147,6 @@ def back(self):
         'error': "Falsche Parameter auf back.php",
       })
   src_ip = self.META['REMOTE_ADDR']
-  print "src ip: ", src_ip
 
   # Delete entry in DB
   try:
