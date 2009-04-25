@@ -1,8 +1,15 @@
 There are a lot TODOs ... so if you are interested, drop us a mail.
 
-- Get specification of XML RPC
 - Use autoconfigure (?)
-- Better documentation
+  I've never done a bigger software project, so I'm a noob here...
+- Better documentation (could always be better)
 - Debugging
-- Management Scripts
+- Management Scripts, debian package
+
+- iPass support
+- Event login
+- eduroam iteroperability
+
+- Get specification of XML RPC (There is no, at least Monzoon has no ... See
+  the xml-rpc-server.py for "me version of the specification")
 
