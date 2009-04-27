@@ -60,7 +60,8 @@ class provider(models.Model):
     remote_ipv4 = models.IPAddressField()
     int_ipv4    = models.IPAddressField()   # interface IP Address
     int_ipv6    = models.IPAddressField()   # interface IP Address
-    user_agent  = models.ManyToManyField("user_agent")
+    user_agent  = models.ManyToManyField("user_agent", blank=True)
+    iframe_url  = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return str(self.name)

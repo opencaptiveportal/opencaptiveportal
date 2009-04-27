@@ -1,14 +1,17 @@
 #!/bin/bash
 
-# only as lisa executable
+# This init.d Script is to start the python daemon, which answers the fastcgi
+# requests
+
+# Only as root executable
 if [ $UID != 0 ]; then
   echo "Error: $0 must be executed as user root!"
   exit 2
 fi
 
 start () {
-#  PYTHONPATH=/home/kleefass/pocp/ \
-#      /usr/local/selfnet/lisa-2.0/scripts/swing/session_delete_all.py
+#  PYTHONPATH=/path/to/the/django/project/ \ 
+#      /some/script/that/uses/the/django/environment.py
   mkdir -p           /tmp/landingpage/
   chown -R www-data: /tmp/landingpage/
   mkdir -p           /var/www/fast_cgi/
@@ -17,12 +20,14 @@ start () {
   sudo -u www-data python ./manage.py runfcgi method=prefork \
       socket=/var/www/fast_cgi/mysite.sock \
       pidfile=/var/www/fast_cgi/django.pid
-  # check, dass das geht:
+
   if [ "`ps aux | grep "python ./manage.py runfcgi method=prefork" | \
           grep -v "grep python" | wc -l`" -gt 0 ]; then
     echo "                                                  [ done ]"
+    exit 0
   else
     echo "                                                  [*fail*]"
+    exit 9
   fi
 }
 
@@ -32,6 +37,7 @@ stop () {
       perl -p -i -e 's#[\ ]+# #g' | cut -d " " -f 2 | \
       perl -p -i -e 's#\n# #g' | xargs kill -9
   echo "                                                  [ done ]"
+  exit 0
 }
 
 
@@ -48,5 +54,6 @@ elif [ "$1" == "restart" ]; then
   start
 else 
   echo "Usage: $0 [ start | stop | restart ]"
+  exit 9
 fi
 

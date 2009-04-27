@@ -22,13 +22,20 @@ def admin(request):
       'loggedin': loggedin,
     })
 
-def add_active_route(src_ip, prov = None, conf = False):
-  from pocp.ocp.models import provider, active_route
+def add_active_route(src_ip, prov = None, conf = None):
+  from pocp.ocp.models import provider, active_route, active_conf
   if not conf and prov is None:
     return False
   if conf:
-    from settings import GRE_TUNNEL_CONF
     prov = provider.objects.get(gre_tunnel = GRE_TUNNEL_CONF)
+    try:
+      a = active_conf.objects.get(src_ip = src_ip)
+      a.delete()
+    except:
+      pass
+    a = active_conf(src_ip = src_ip)
+    return a.save()
+  # not conference
   elif type(prov) in (unicode, str):
     prov = provider.objects.get(name = prov)
   # Delete existing active_route to src_ip, just to be sure
@@ -45,28 +52,26 @@ def landingpage(request):
   """
   Show the Landingpage"
   """
-  #DEBUG print request.META['HTTP_USER_AGENT']
-  # User-Agent iPass / iPassConnect
+  from pocp.ocp.models import provider, round_robin
+  from random import random
+  # User-Agent: iPassConnect (iPass)
   if request.META.has_key('HTTP_USER_AGENT'):
     if request.META['HTTP_USER_AGENT'] == 'iPassConnect':
       src_ip  = request.META['REMOTE_ADDR']
       # Round Robin for WISP
-      from random import random
-      from pocp.ocp.models import round_robin
-      r = random()
-      last = 0
-      for o in round_robin.objects.all():
-        if r <= o.rate + last:
-          e = o
+      my_random = random()
+      for obj in round_robin.objects.all():
+        if my_random <= obj.rate:
+          prov = obj
           break
-        last += o.rate
-      prov = e
+        else:
+          my_random -= obj.rate
       # Add and save new route
       add_active_route(src_ip = src_ip, prov = prov)
       return render_to_response('ipass.htm', {})
-  # /iPass
+  # /User-Agent
 
-  # Von django.contrib.auth.views, login:
+  # See django.contrib.auth.views, login:
   redirect_to = '/'
   loggedin = False
   if str(request.user) != "AnonymousUser":
@@ -103,12 +108,33 @@ def landingpage(request):
     url = request.GET['url']
   else:
     url = request.build_absolute_uri()
+
+  # Round Robin for WISP
+  provs = []
+  for prov in round_robin.objects.all():
+    if prov.provider.iframe_url != '':
+      provs.append(prov)
+  sorted_provs = []
+  last = 0
+  while len(provs) > 0:
+    my_random = random() - last
+    for prov in provs:
+      if my_random <= prov.rate:
+        sorted_provs.append(prov.provider)
+        last += prov.rate
+        provs.remove(prov)
+        break
+      else:
+        my_random -= prov.rate
+
+  # than, repace the rest of the template
   return render_to_response('landingpage.htm', {
       'username': request.user,
       'loggedin': loggedin,
       'form':     form,
-      'site':     "taranaki.switch.ch", # TODO: hostname
+      'site':     request.META['SERVER_NAME'],
       'url':      url,
+      'wisps':    sorted_provs,
     })
 
 

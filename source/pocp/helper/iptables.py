@@ -33,6 +33,14 @@ def insert_route(src_ip, gre_tunnel):
   return True
 
 
+def insert_conf(src_ip):
+  """
+  Inserta a route with source ip sc_ip, member of a conference
+  """
+  from settings import GRE_TUNNEL_CONF
+  return insert_route(src_ip, GRE_TUNNEL_CONF)
+
+
 def delete_route(src_ip):
   """
   Delete the route with source ip src_ip.

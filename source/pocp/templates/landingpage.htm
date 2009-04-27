@@ -110,22 +110,11 @@
   <th colspan="4" align="left"><h1>Commercial Internet Access</h1></th>
  </tr>
  <tr>
+{% for wisp in wisps %}
   <td>
-   <!-- <a href="route.php?provider=1">TEST: KLICK HIER fuer Auswahl</a><br /><br /> -->
-   <iframe src="http://iframe.monzoon.net/switch" width="261" height="200" rolling="no" frameborder="0"></iframe>
+   <iframe src="{{ wisp.iframe_url }}" width="261" height="200" rolling="no" frameborder="0"></iframe>
   </td>
-  <td>
-   <!-- <a href="route.php?provider=2">TEST: KLICK HIER fuer Auswahl</a><br /><br /> -->
-   <iframe src="https://www.swisscom-mobile.ch/scm/upload/page/pwlan_roaming_iframe-en.aspx?host={{ site }}/" width="261" height="200" rolling="no" frameborder="0"></iframe>
-  </td>
-  <td>
-   <!-- <a href="route.php?provider=3">TEST: KLICK HIER fuer Auswahl</a><br /><br /> -->
-   <iframe src="http://loginweb.tpn.ch/prelanding/switch-mobile/index.php?mpp={{ site }}" width="261" height="200" rolling="no" frameborder="0"></iframe>
-  </td>
-  <td>
-   <!-- <a href="route.php?provider=4">TEST: KLICK HIER fuer Auswahl</a><br /><br /> -->
-   <iframe src="https://wlanauth.thenet.ch/frame/thenet_frame_secure.php?url={{ url }}&site={{ site }}" width="261" height="200" rolling="no" frameborder="0"></iframe>
-  </td>
+{% endfor %}
  </tr>
 </table>
 
