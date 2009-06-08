@@ -1,0 +1,60 @@
+#!/bin/bash
+
+# This init.d Script is to start the XML RPC daemon
+
+PIDFILE=/var/run/ocp-xml-rpc.pid
+
+# Only as root executable
+if [ $UID != 0 ]; then
+  echo "Error: $0 must be executed as user root!"
+  exit 2
+fi
+
+start () {
+#  PYTHONPATH=/path/to/the/django/project/ \ 
+#      /some/script/that/uses/the/django/environment.py
+  cd /home/kleefass/pocp/
+  sudo -u www-data python ./xml-rpc-server.py &
+  mpid="$!"
+
+
+  if [ "`ps -a $mpid | wc -l`" -gt 1 ]; then
+    echo "$mpid" > $PIDFILE
+    echo "                                                  [ done ]"
+    exit 0
+  else
+    echo "                                                  [*fail*]"
+    exit 9
+  fi
+}
+
+stop () {
+  kill `cat $PIDFILE`
+  if [ $? -eq 0 ]; then
+    rm -f $PIDFILE
+    echo "                                                  [ done ]"
+    exit 0
+  else
+    echo "                                                  [*fail*]"
+    exit 9
+  fi
+
+}
+
+
+if [ "$1" == "start" ]; then
+  echo -n "Starting xml-rpc server ...   "
+  start
+elif [ "$1" == "stop" ]; then
+  echo -n "Stoppin xml-rpc server  ...   "
+  stop
+elif [ "$1" == "restart" ]; then
+  echo -n "Restartin xml-rpc server  ... "
+  stop || true
+  sleep 1
+  start
+else 
+  echo "Usage: $0 [ start | stop | restart ]"
+  exit 9
+fi
+
