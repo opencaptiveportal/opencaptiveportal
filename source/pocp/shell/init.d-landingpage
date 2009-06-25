@@ -16,7 +16,7 @@ start () {
   chown -R www-data: /tmp/landingpage/
   mkdir -p           /var/www/fast_cgi/
   chown -R www-data: /var/www/fast_cgi/
-  cd /home/kleefass/pocp/
+  cd /usr/local/pocp/
   sudo -u www-data python ./manage.py runfcgi method=prefork \
       socket=/var/www/fast_cgi/mysite.sock \
       pidfile=/var/www/fast_cgi/django.pid

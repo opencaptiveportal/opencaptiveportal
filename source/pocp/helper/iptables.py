@@ -89,7 +89,6 @@ def make_iptables(tmp_file = None):
           { 'wisps':           wisps,
             'active_session':  active_sessions,
             'classic_acls':    fetch_switch_classic(),
-            'landing_page':    '130.59.98.225',
           } ).encode("utf-8")
 
   # Debug

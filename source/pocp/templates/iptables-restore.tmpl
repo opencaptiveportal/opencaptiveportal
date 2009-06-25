@@ -49,8 +49,8 @@
 :OUTPUT ACCEPT [0:0]
 
 ## For the Button from Monzoon:
--A PREROUTING -d 192.168.0.0/16 -p tcp -m tcp --dport 80  -j DNAT --to 130.59.98.225:80
--A PREROUTING -d 192.168.0.0/16 -p tcp -m tcp --dport 443 -j DNAT --to 130.59.98.225:443
+-A PREROUTING -d 192.168.0.0/16 -p tcp -m tcp --dport 80  -j REDIRECT
+-A PREROUTING -d 192.168.0.0/16 -p tcp -m tcp --dport 443 -j REDIRECT
 
 ## For each WISP one chain:
 {% for wisp in wisps %}
@@ -58,6 +58,7 @@
 {% endfor %}
 
 :SWITCHclassic - [0:0]
+## Some special rules
 -A SWITCHclassic -d 138.188.8.5 -p tcp -m tcp --dport 80 -j ACCEPT 
 -A SWITCHclassic -d 138.188.8.5 -p tcp -m tcp --dport 443 -j ACCEPT 
 -A SWITCHclassic -d 10.192.23.20 -j ACCEPT 
@@ -92,10 +93,10 @@
 ## DNAT to the landingpage
 ## Remark: connlimit limits the number of parallel TCP connections per client
 ## IP address
-##-A SWITCHclassic -m tcp -p tcp --dport 80  -m connlimit ! --connlimit-above 5 -j DNAT --to-destination {{ landing_page }}
-##-A SWITCHclassic -m tcp -p tcp --dport 443 -m connlimit ! --connlimit-above 5 -j DNAT --to-destination {{ landing_page }}
--A SWITCHclassic -m tcp -p tcp --dport 80  -j DNAT --to-destination {{ landing_page }}
--A SWITCHclassic -m tcp -p tcp --dport 443 -j DNAT --to-destination {{ landing_page }}
+##-A SWITCHclassic -m tcp -p tcp --dport 80  -m connlimit ! --connlimit-above 5 -j REDIRECT
+##-A SWITCHclassic -m tcp -p tcp --dport 443 -m connlimit ! --connlimit-above 5 -j REDIRECT
+-A SWITCHclassic -m tcp -p tcp --dport 80  -j REDIRECT
+-A SWITCHclassic -m tcp -p tcp --dport 443 -j REDIRECT
 -A SWITCHclassic -j LOG
 ## TODO:
 ##-A SWITCHclassic -j DROP
