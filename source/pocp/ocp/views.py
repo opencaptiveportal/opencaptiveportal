@@ -120,6 +120,9 @@ def landingpage(request):
     my_random = random() - last
     for prov in provs:
       if my_random <= prov.rate:
+        prov.provider.iframe_url = prov.provider.iframe_url.replace("{{ site }}", request.META['SERVER_NAME'])
+        prov.provider.iframe_url = prov.provider.iframe_url.replace("{{ url }}", url)
+        print "DEBUG:", type( prov.provider.iframe_url )
         sorted_provs.append(prov.provider)
         last += prov.rate
         provs.remove(prov)
@@ -132,8 +135,6 @@ def landingpage(request):
       'username': request.user,
       'loggedin': loggedin,
       'form':     form,
-      'site':     request.META['SERVER_NAME'],
-      'url':      url,
       'wisps':    sorted_provs,
     })
 
