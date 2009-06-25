@@ -16,7 +16,8 @@ start () {
   chown -R www-data: /tmp/landingpage/
   mkdir -p           /var/www/fast_cgi/
   chown -R www-data: /var/www/fast_cgi/
-  cd /usr/local/pocp/
+  cd /usr/local/pocp/ || { echo "Could not changedir to /usr/local/pocp/"; exit 9; }
+  DJANGO_SETTINGS_MODULE="pocp.settings" \
   sudo -u www-data python ./manage.py runfcgi method=prefork \
       socket=/var/www/fast_cgi/mysite.sock \
       pidfile=/var/www/fast_cgi/django.pid
@@ -32,10 +33,16 @@ start () {
 }
 
 stop () {
-  kill `cat /var/www/fast_cgi/django.pid` || \
+  if [ -f /var/www/fast_cgi/django.pid  ]; then
+    kill `cat /var/www/fast_cgi/django.pid`;
+    mret=$?;
+    rm -f /var/www/fast_cgi/django.pid;
+  fi
+  if [ $? -ne 0 ]; then
       ps aux | grep "python ./manage.py runfcgi method=prefork" | \
       perl -p -i -e 's#[\ ]+# #g' | cut -d " " -f 2 | \
       perl -p -i -e 's#\n# #g' | xargs kill -9
+  fi
   echo "                                                  [ done ]"
   exit 0
 }
