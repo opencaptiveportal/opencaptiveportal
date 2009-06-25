@@ -17,6 +17,7 @@ start () {
   mkdir -p           /var/www/fast_cgi/
   chown -R www-data: /var/www/fast_cgi/
   cd /usr/local/pocp/ || { echo "Could not changedir to /usr/local/pocp/"; exit 9; }
+  ( cd shell && DJANGO_SETTINGS_MODULE="pocp.settings" ./iptables-restore.py )
   DJANGO_SETTINGS_MODULE="pocp.settings" \
   sudo -u www-data python ./manage.py runfcgi method=prefork \
       socket=/var/www/fast_cgi/mysite.sock \
