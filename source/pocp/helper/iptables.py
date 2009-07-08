@@ -124,36 +124,6 @@ def show_iptables():
   return out
 
 
-def make_gre_tunnel(id = None):
-  """
-  Make the GRE Tunnel with the id.
-  If no id is given, make all GRE Tunnels.
-  Also set the needed routes and IP adresses for these GRE Tunnel(s).
-  Attention: It it delete all existing GRE tunnels with the here given ids.
-  """
-  from pocp.ocp.models import provider
-  import os
-  ret = True
-  for p in provider.objects.all():
-    id = "wisp_%s" % str(p.gre_tunnel)
-    # delete gre tunnel:
-    #   ip tunnel del gre_100 mode gre 
-    if os.system("""/usr/bin/sudo /bin/ip tunnel del %s""" \
-        % ( id ) ):
-      # create gre tunnel:
-      #   ip tunnel add gre_100 mode gre local 130.59.98.210 remote 141.31.176.240
-      os.system("""/usr/bin/sudo /bin/ip tunnel add %s mode gre local %s remote %s""" \
-          % ( id, p.local_ipv4, p.remote_ipv4 ) )
-      # interface ip addresses
-      if p.int_ipv4:
-        os.system("""/usr/bin/sudo /bin/ip addr add %s dev %s""" % ( p.int_ipv4, id ) )
-      if p.int_ipv6:
-        os.system("""/usr/bin/sudo /bin/ip addr add %s dev %s""" % ( p.int_ipv6, id ) )
-    else:
-      ret = False
-  return ret
-
-
 def fetch_switch_classic(url = SWITCHclassic_url):
   """
   Fetch the SWITCHConnect Classic ACLs.

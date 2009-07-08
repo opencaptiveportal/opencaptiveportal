@@ -25,6 +25,8 @@ urlpatterns = patterns('',
     (r'^service/iptables/show',    'pocp.ocp.view_iptables.show'),
     (r'^service/iptables/rebuild', 'pocp.ocp.view_iptables.rebuild'),
     
+    (r'^service/ip/show',    'pocp.ocp.view_ip.show'),
+    (r'^service/ip/rebuild', 'pocp.ocp.view_ip.rebuild'),
     
     (r'^admin-overview/', 'pocp.ocp.views.admin'),
 

@@ -1,0 +1,24 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- 
+# +------------------------------------------------+
+# | OpenCaptivePortal                              |
+# |                                                |
+# | For further information please see             |
+# |    http://code.google.com/p/opencaptiveportal/ |
+# | or                                             |
+# |    http://www.switch.ch/mobile/pwlan/          |
+# +------------------------------------------------+
+#
+-->
+<html>
+<head><title>show IP configuration</title></head>
+<body>
+<p>IP configuration (live)</p>
+{% if error %}
+<p style="color: red;">Error: <pre style="color: red;">{{ error }}</pre></p>
+{% endif %}
+<pre>
+{{ ip }}
+</pre>
+</body>
+</html>

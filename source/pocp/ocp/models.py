@@ -56,10 +56,10 @@ class active_conf(models.Model):
 class provider(models.Model):
     name        = models.CharField(max_length=255, unique=True)
     gre_tunnel  = models.IntegerField()
-    local_ipv4  = models.IPAddressField()   # GRE tunnel endpoints
-    remote_ipv4 = models.IPAddressField()
-    int_ipv4    = models.IPAddressField()   # interface IP Address
-    int_ipv6    = models.IPAddressField()   # interface IP Address
+    local_ipv4  = models.IPAddressField()   # GRE tunnel endpoint local
+    remote_ipv4 = models.IPAddressField()   # GRE tunnel endpoint remote
+    int_ipv4    = models.IPAddressField()   # interface IP Address local
+    int_ipv6    = models.IPAddressField()   # interface IP Address local
     user_agent  = models.ManyToManyField("user_agent", blank=True)
     iframe_url  = models.CharField(max_length=255, blank=True, null=True)
 
@@ -69,6 +69,18 @@ class provider(models.Model):
     class Admin:
         list_display  = ('name', 'gre_tunnel')
         search_fields = ['name']
+
+
+    def save(self, force_insert=False, force_update=False):
+        from pocp.helper.ip import create_tunnel, delete_tunnel
+        delete_tunnel(self.gre_tunnel)
+        create_tunnel(self.gre_tunnel, self.local_ipv4, self.remote_ipv4, self.int_ipv4)
+        super(provider, self).save(force_insert, force_update) # Call the "real" save() method.
+
+    def delete(self):
+        from pocp.helper.ip import delete_tunnel
+        delete_tunnel(self.gre_tunnel)
+        super(provider, self).delete() # Call the "real" save() method.
 
 
 # TODO: online eine liste mir den daten haben und die dann wie die
