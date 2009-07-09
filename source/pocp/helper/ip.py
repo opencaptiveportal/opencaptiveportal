@@ -40,8 +40,9 @@ def create_tunnel(gre_tunnel, local_ipv4, remote_ipv4, int_ipv4):
     raise iptExc("Could not add IP addresse %s to GRE tunnel gre%i" % (int_ipv4, gre_tunnel))
   try:
     ret = os.system("""
-        /usr/bin/sudo /bin/ip tunnel add gre%i mode gre remote %s local %s
-      """ % (gre_tunnel, remote_ipv4, local_ipv4))
+        /usr/bin/sudo /bin/ip tunnel add gre%i mode gre remote %s local %s;
+        /usr/bin/sudo /bin/ip link set dev gre%i up
+      """ % (gre_tunnel, remote_ipv4, local_ipv4, gre_tunnel))
     if ret != 0:
       raise_gre()
   except:
