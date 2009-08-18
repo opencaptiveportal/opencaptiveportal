@@ -1,0 +1,112 @@
+@charset "UTF-8";
+
+/* Layout-independent adjustments | Layout-unabhängige Anpassungen ----------------------------------- */
+@import url(iehacks.css);
+
+/* Layout-dependent adjustments | Layout-abhängige Anpassungen --------------------------------------- */
+@media screen
+{
+  /*-----------------------------------------------------------------------------------------------------*/
+
+  /**
+   * Bugfix for IE 3-Pixel-Jog Bug
+   *
+   * @bugfix
+   * @affected   IE 5.x/Win, IE6
+   * @css-for    IE 5.x/Win, IE6
+   * @valid      yes
+   */
+
+  * html #col1 {
+  	margin-right: -3px;
+  }
+  * html #col2 {
+  	margin-right: -3px;
+  }
+  * html .index #col2 {
+  	margin-left: -3px;
+	margin-right: 0;
+	width: 21.2727em;
+  }
+  * html .index #col3 {
+  	margin-right: 23.3636em;
+	height: 1%;
+  }
+  * html .c3 #col3 {
+  	margin-right: 23.5454em;
+  }
+  
+  * html #col3_content {
+  	margin-left: -3px;
+	padding-left: 1.7272em;
+  }
+
+  /*-----------------------------------------------------------------------------------------------------*/
+  * html #border_bottom {
+    width: 29px;
+    height: 268px;
+  }
+  
+  * html #footer {
+	width: 74.6666em;
+  }
+  
+  /*-----------------------------------------------------------------------------------------------------*/
+  * html #topnav ul li.fontsizing,
+  * + html #topnav ul li.fontsizing {
+  	margin-top: -0.1em;
+  }
+  
+  /*-----------------------------------------------------------------------------------------------------*/
+  * html ul.orange {
+  	background: url(../images/nav/submenu_gelb_br.gif) no-repeat top right;
+	border-bottom: 1px solid #f0b95d;
+  }
+  * html ul.blue {
+  	background: url(../images/nav/submenu_blau_br.gif) no-repeat top right;
+	border-bottom: 1px solid #4f68a5;
+  }
+  * html ul.grey {
+  	background: url(../images/nav/submenu_grau_br.gif) no-repeat top right;
+	border-bottom: 1px solid #9ea8a7;
+  }
+  
+  /*-----------------------------------------------------------------------------------------------------*/
+  
+  /* Linkbox */
+  * html #whois {
+  	padding-bottom: 0;
+  }
+  
+  * html input.whois_url {
+  	width: 12em;
+  }
+  
+  /* ### Preformatted contents | Vorformatierte Inhalte #### */
+  pre, code, tt { 
+	font-family: monospace;
+	font-size: 109%;
+  }
+
+/*------------------------------------------ Teaserbox ----------------------------------------*/
+/*---------------------------------------------------------------------------------------------*/
+  * html .teaserbox {
+  	position: relative;
+  }
+  
+  
+/*----------------------------------------- Subcolumns ----------------------------------------*/
+/*---------------------------------------------------------------------------------------------*/
+  * html .subcolumns .subcm,
+  * html .subcolumns_border {word-wrap:break-word;overflow:hidden}
+  
+ 
+/*----------------------------------------- Oversized ----------------------------------------*/
+/*---------------------------------------------------------------------------------------------*/
+  * html .oversized_content {
+	margin-right: -165%;
+  }
+  
+  
+  
+}

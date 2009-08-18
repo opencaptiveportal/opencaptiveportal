@@ -1,0 +1,11 @@
+@charset "UTF-8";
+
+/* import core styles | Basis-Stylesheets einbinden */
+  @import url(base.css);
+
+/* import screen layout | Screen-Layout einbinden */
+  @import url(custom-basemod.css);
+  @import url(custom-nav.css);
+
+/* import print layout | Druck-Layout einbinden */
+/* @import url(css/custom-print.css); */
