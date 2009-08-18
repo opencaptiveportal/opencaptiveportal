@@ -49,7 +49,7 @@ class active_conf(models.Model):
     def delete(self):
         from pocp.helper.iptables import delete_conf
         # and then in iptables
-        delete_route(self.src_ip)
+        delete_conf(self.src_ip)
         super(active_conf, self).delete() # Call the "real" save() method.
 
 

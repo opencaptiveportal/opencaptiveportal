@@ -46,6 +46,9 @@
 *nat
 :PREROUTING ACCEPT [0:0]
 :POSTROUTING ACCEPT [0:0] 
+{% for net in EASY_MASQUERADE %}
+-A POSTROUTING -s {{ net }} -j MASQUERADE
+{% endfor %}
 :OUTPUT ACCEPT [0:0]
 
 ## For the Button from Monzoon:
@@ -124,7 +127,7 @@ COMMIT
 
 ## Set Mark for active sessions (saved in DB)
 {% for ip, hexid in active_session %}
--A POSTROUTING -s {{ ip }} -j MARK --set-mark {{ hexid }}
+-A PREROUTING -s {{ ip }} -j MARK --set-mark {{ hexid }}
 {% endfor %}
 
 ## TCPMSS, important because of GRE tunnels

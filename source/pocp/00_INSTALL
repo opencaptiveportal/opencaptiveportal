@@ -1,4 +1,7 @@
 
+New:
+- aptitude install python-ldap python-ldap-doc
+
 Please see
 
   http://code.google.com/p/opencaptiveportal/wiki/Install

@@ -11,6 +11,9 @@ admin.autodiscover()
 urlpatterns = patterns('',
     # Example:
     # (r'^pocp/', include('pocp.foo.urls')),
+    # css
+    (r'^rsc/(?P<path>.*)$', 'django.views.static.serve',
+            {'document_root': '/home/kleefass/pocp/templates/rsc/'}),
 
     # landingpage:
     (r'^back.php',  'pocp.ocp.views.back'),

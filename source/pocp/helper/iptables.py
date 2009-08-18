@@ -60,6 +60,13 @@ def delete_route(src_ip):
   return True
     
 
+def delete_conf(src_ip):
+  """
+  Delete a route with source ip sc_ip, member of a conference
+  """
+  return delete_route(src_ip)
+
+
 def make_iptables(tmp_file = None):
   """
   Build the iptables-restore file and apply it.
@@ -72,6 +79,10 @@ def make_iptables(tmp_file = None):
   from django.template.loader import render_to_string
   from pocp.ocp.models import provider, active_route
   import os
+  try:
+    from settings import EASY_MASQUERADE
+  except:
+    EASY_MASQUERADE = ()
 
   # get provider GRE tunnel ids
   wisps = []
@@ -89,6 +100,7 @@ def make_iptables(tmp_file = None):
           { 'wisps':           wisps,
             'active_session':  active_sessions,
             'classic_acls':    fetch_switch_classic(),
+            'EASY_MASQUERADE': EASY_MASQUERADE,
           } ).encode("utf-8")
 
   # Debug

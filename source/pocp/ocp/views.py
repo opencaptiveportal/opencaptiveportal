@@ -24,6 +24,7 @@ def admin(request):
 
 def add_active_route(src_ip, prov = None, conf = None):
   from pocp.ocp.models import provider, active_route, active_conf
+  from settings import GRE_TUNNEL_CONF
   if not conf and prov is None:
     return False
   if conf:
@@ -93,8 +94,12 @@ def landingpage(request):
       give_internet = request.POST.get('give_internet','0')
       if give_internet:
         try:
-          src_ip  = request.META['REMOTE_ADDR']
-          add_active_route(src_ip = src_ip, prov = None, conf = True)
+          src_ip = request.META['REMOTE_ADDR']
+          try:
+            add_active_route(src_ip = src_ip, prov = None, conf = True)
+            print "DEBUG: Activated conf for src_ip", src_ip
+          except:
+            print "ERROR: Could not activate route for src_ip", src_ip, "(conference modus)."
         except:
           pass
       if request.session.test_cookie_worked():
