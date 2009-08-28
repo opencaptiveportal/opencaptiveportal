@@ -44,8 +44,6 @@ stop () {
       perl -p -i -e 's#[\ ]+# #g' | cut -d " " -f 2 | \
       perl -p -i -e 's#\n# #g' | xargs kill -9
   fi
-  echo "                                                  [ done ]"
-  exit 0
 }
 
 
@@ -55,6 +53,8 @@ if [ "$1" == "start" ]; then
 elif [ "$1" == "stop" ]; then
   echo -n "Stopping landingpage ...   "
   stop
+  echo "                                                  [ done ]"
+  exit 0
 elif [ "$1" == "restart" ]; then
   echo -n "Restarting landingpage ... "
   stop || true
