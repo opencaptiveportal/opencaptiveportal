@@ -26,10 +26,11 @@ class ActiveDirectoryGroupMembershipSSLBackend:
       return self.get_or_create_user(username,password)
     except ImportError:
       pass
-    #except ldap.INVALID_CREDENTIALS:
-    #   pass
+    except ldap.INVALID_CREDENTIALS:
+       pass
 
   def get_or_create_user(self, username, password):
+      from django.contrib.auth.models import User, Group
       try:
          user = User.objects.get(username=username)
       except User.DoesNotExist:
@@ -142,6 +143,7 @@ class ActiveDirectoryGroupMembershipSSLBackend:
       return user
 
   def get_user(self, user_id):
+      from django.contrib.auth.models import User
       try:
         return User.objects.get(pk=user_id)
       except User.DoesNotExist:
