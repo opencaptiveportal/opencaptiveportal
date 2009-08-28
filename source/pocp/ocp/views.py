@@ -28,7 +28,6 @@ def add_active_route(src_ip, prov = None, conf = None):
   if not conf and prov is None:
     return False
   if conf:
-    prov = provider.objects.get(gre_tunnel = GRE_TUNNEL_CONF)
     try:
       a = active_conf.objects.get(src_ip = src_ip)
       a.delete()
