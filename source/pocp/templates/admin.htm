@@ -9,39 +9,89 @@
 # |    http://www.switch.ch/mobile/pwlan/          |
 # +------------------------------------------------+
 #
-# Login page and overview for administrators
-# 
+# TODO:
+# - Round Robin for WISPs
 -->
 <html>
  <head>
-  <title>Aministrato Login (SWITCH - Hotspot)</title>
+  <title>SWITCH - Hotspot</title>
   <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
-  <link rel="stylesheet" href="http://www.switch.ch/switch-web/css/main.css" type="text/css">
+  <link href="http://www.switch.ch/switch-web/css/layout.css" rel="stylesheet" type="text/css" />
+  <!--[if lte IE 7]>
+    <link href="css/custom-patch.css" rel="stylesheet" type="text/css" />
+  <![endif]-->
+  <script type="text/javascript" src="http://www.switch.ch/switch-web/js/jquery-1.2.6.min.js"></script>
+  <script type="text/javascript" src="http://www.switch.ch/switch-web/js/utils.js"></script>
  </head>
 <body bgcolor="#ffffff" topmargin="0" leftmargin="0" marginwidth="0" marginheight="0">
+ <style type="text/css">
+	<!--
+	table {
+	 font-size: 75.00%;
+ 	}
+	-->
+ </style>
+    <div id="page_margins">
+      <div id="page">
+        <div id="header" class="subsite">
+          <div id="topnav">
+            <!-- Start: Skiplink-Navigation -->
+            <div id="skiplinks">
+              <!-- <a class="skip" accesskey="0" href="/" title="Direkt zur Startseite springen">Direkt zur Startseite springen</a> <a class="skip" accesskey="1" href="#topnav_skip" title="Direkt zur Navigation springen">Direkt zur Top Navigation springen</a> <a class="skip" accesskey="2" href="#navigation" title="Direkt zur Navigation springen">Direkt zur Navigation springen</a> <a class="skip" accesskey="3" href="#content" title="Direkt zum Inhalt springen">Direkt zum Inhalt springen</a> <a class="skip" accesskey="4" href="http://www.switch.ch/about/contact/" title="Direkt zur Kontakt-Seite springen">Direkt zur Kontakt-Seite springen</a> -->
+            </div><!-- Ende: Skiplink-Navigation -->
+            <a id="topnav_skip" name="topnav"></a> <!-- skiplink anchor: topnav -->
+            <!-- <ul>
+              <li>
+                <a href="/" title="">Start</a>
+              </li>
+              <li>|
+              </li>
+              <li>
+                <a href="http://www.switch.ch/about/news/" title="">News</a>
+              </li>
+              <li>|
+              </li>
+              <li>
+                <a href="http://www.switch.ch/about/contact/" title="">Contact</a>
+              </li>
+              <li class="printing invisible">
+                <a href="#" title="Drucken"><span class="float_left">Drucken</span> <img src="http://www.switch.ch/switch-web/images/icons/icon_print.gif" alt="" class="icon_print" /></a>
+              </li>
+              <li>
+                <a href="#" title="">de</a>
+              </li>
+              <li>|
+              </li>
+              <li>
+                <a href="#" title="">fr</a>
+              </li>
+              <li>|
+              </li>
+              <li>
+                <a href="#" title="">it</a>
+              </li>
+              <li>|
+              </li>
+              <li class="last">
+                <a href="#" title="" class="current">en</a>
+              </li>
+            </ul> -->
+          </div><a href="/" title="Start"><img src="http://www.switch.ch/switch-web/images/logo.gif" alt="SWITCH Logo" id="logo" /></a>
+          <!-- end: div topnav -->
+        </div>
+	<!-- end: div header -->
 
-<!-- start header -->
-<table bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" width="780">
- <tr>
-  <td colspan="6"><img src="http://www.switch.ch/switch-web/images/head_spacer.gif" name="head_spacer" width="740" height="20" border="0" alt=""></td>
- </tr>
- <tr>
-  <td colspan="6"><a href="http://www.switch.ch/"><img src="http://www.switch.ch/switch-web/images/start_switch_logo.gif" name="head_switch_logo" height="63" border="0" alt="SWITCH Logo"></a></td>
- </tr>
- <tr>
-  <td colspan="6"><img src="http://www.switch.ch/switch-web/images/head_stripes.gif" name="head_stripes" width="780" height="15" border="0" alt=""></td>
- <tr>
-  <td colspan="6"><img src="http://www.switch.ch/switch-web/images/head_colorgradient.jpg" name="head_colorgradient" width="780" height="10" border="0" alt=""></td>
- </tr>
-</table>
+	<!-- begin: main navigation #nav -->
+        <!-- begin: main content area #main -->
+        <div id="main" class="c1">
+
+          <!-- begin: #col3 static column -->
+          <div id="col3">
+            <div id="col3_content" class="clearfix"> 
+
 
 <!-- Contenc -->
-<table bgcolor="#ffffff" border="0" cellpadding="5" cellspacing="5" width="1040">
- <tr>
-  <th colspan="4" align="left"><h1>Administration</h1></th>
- </tr> 
- <tr>
-  <td colspan="4">
+<h1>Administration</h1>
 
 {% if no_cookies %}
 <p style="color: red;">Dein Browser unterstützt keine Cookies. Bitte aktivere sie um dich anzumelden.</p>
@@ -93,4 +143,10 @@
  </tr>
 </table>
 
+
+   </div> <!-- end: col3_content -->
+  </div> <!-- end: col3 -->
+ </div> <!-- end: main -->
+ </div> <!-- end: page -->
+</div> <!-- end: page_margins -->
 </body>
