@@ -80,7 +80,7 @@ def make_iptables(tmp_file = None):
   from pocp.ocp.models import provider, active_route
   import os
   try:
-    from settings import EASY_MASQUERADE
+    from pocp.settings import EASY_MASQUERADE
   except:
     EASY_MASQUERADE = ()
 
