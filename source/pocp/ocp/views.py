@@ -22,9 +22,22 @@ def admin(request):
       'loggedin': loggedin,
     })
 
+def del_active_route(src_ip):
+  from pocp.ocp.models import active_route, active_conf
+  try:
+    a = active_conf.objects.get(src_ip = src_ip)
+    a.delete()
+  except:
+    pass
+  try:
+    a = active_route.objects.get(src_ip = src_ip)
+    a.delete()
+  except:
+    pass
+  return True
+
 def add_active_route(src_ip, prov = None, conf = None):
   from pocp.ocp.models import provider, active_route, active_conf
-  from settings import GRE_TUNNEL_CONF
   if not conf and prov is None:
     return False
   if conf:
@@ -80,12 +93,20 @@ def landingpage(request):
     form = AuthenticationForm(data=request.POST)
     if str(request.user) != "AnonymousUser":
       from django.contrib.auth.views import logout
+      # Delete active conf
+      try:
+        src_ip = request.META['REMOTE_ADDR']
+        del_active_route(src_ip = src_ip)
+      except:
+        pass
       logout(request, '/')
       return HttpResponseRedirect('/')
     if form.is_valid():
       # Light security check -- make sure redirect_to isn't garbage.
       if not redirect_to or '//' in redirect_to or ' ' in redirect_to:
         redirect_to = settings.LOGIN_REDIRECT_URL
+      # Set URL; TODO: the path does not work with apache2 and fast_cgi, why ?
+      redirect_to = request.build_absolute_uri( request.get_full_path() )
       from django.contrib.auth import login
       login(request, form.get_user())
       # If the user wants internet (he is coming from the landingepage and not
