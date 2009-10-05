@@ -8,7 +8,8 @@
 LISTEN_IP   = None # if none, geht from fqdn
 LISTEN_PORT = 1443
 LEASE_FILE  = "/var/lib/dhcp3/dhcpd.leases"
-SSL_PEM     = "/etc/opencaptiveportal/ssl.pem"  # private key and cert
+SSL_PEM     = "/etc/ssl/ocp.example.com.crt"  # cert
+SSL_KEY     = "/etc/ssl/private/ocp.example.com.key" # private key
 API_VERSION = 0.1
 
 HANDLE_TIMEOUT = 60*5  # 5 minutes

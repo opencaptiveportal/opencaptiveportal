@@ -75,7 +75,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    '/TODO/CHANGE/ME/pocp/templates/',
+    '/usr/local/pocp/templates/',
 )
 
 INSTALLED_APPS = (
@@ -102,31 +102,37 @@ GRE_TUNNEL_CONF  = 5
 #   templates/iptables-restore.tmpl
 # or insert in the set EASY_MASQUERADE all IP ranges
 #EASY_MASQUERADE = () # default, no masquerade
-EASY_MASQUERADE = ( "10.0.1.0/24", )    # masq. all with source in 10.0.1.0/24
+EASY_MASQUERADE = "eth0"	# masq. all which is outgoing on interface eth0
+
+########################################################################
+# * Auth and session timeouts
+SESSION_COOKIE_AGE = 3600
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 ########################################################################
 # * Ldap auth
 # 1)  Activate ldap auth backend, see
 #     http://docs.djangoproject.com/en/dev/ref/settings/#authentication-backends
 AUTHENTICATION_BACKENDS = (
-        'pocp.helper.ldap.ActiveDirectoryGroupMembershipSSLBackend',
+        'pocp.helper.ldap-auth.ActiveDirectoryGroupMembershipSSLBackend',
         'django.contrib.auth.backends.ModelBackend' # Default, must be set!!
     )
+
 # 2)  Local ldap specific configuration statements, see also helper/ldap.py
 # Settings for ldap configuration, see helper/ldap.py
 
-AD_DNS_NAME='your-ldap-server.com'  # CHANGME
+AD_DNS_NAME='example.com'
 # If using non-SSL use these
-#AD_LDAP_PORT=389
-#AD_LDAP_URL='ldap://%s:%s' % (AD_DNS_NAME,AD_LDAP_PORT)
+AD_LDAP_PORT=389
+AD_LDAP_URL='ldap://%s:%s' % (AD_DNS_NAME,AD_LDAP_PORT)
 # If using SSL use these:
-AD_LDAP_PORT=636
-AD_LDAP_URL='ldaps://%s:%s' % (AD_DNS_NAME,AD_LDAP_PORT)
-AD_SEARCH_DN='dc=mygroup,dc=net,dc=com'
-AD_NT4_DOMAIN='YOURDOMAIN'          # CHANGEME
+#AD_LDAP_PORT=636
+#AD_LDAP_URL='ldaps://%s:%s' % (AD_DNS_NAME,AD_LDAP_PORT)
+AD_SEARCH_DN='dc=example,dc=com'
+AD_NT4_DOMAIN='example.com'
 AD_SEARCH_FIELDS= ['mail','givenName','sn','sAMAccountName','memberOf']
-AD_MEMBERSHIP_REQ=['Group_Required','Alternative_Group']
-AD_CERT_FILE='/path/to/your/cert.txt'
+AD_MEMBERSHIP_REQ=['Users']
+AD_CERT_FILE='/dummy/path/muss/hier/stehen.txt'
 AD_DEBUG=True
 AD_DEBUG_FILE='/var/log/ocp/ldap.debug'
 
