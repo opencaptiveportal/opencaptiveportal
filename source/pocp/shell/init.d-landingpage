@@ -19,6 +19,12 @@ start () {
   cd /usr/local/pocp/ || { echo "Could not changedir to /usr/local/pocp/"; exit 9; }
   ( cd shell && DJANGO_SETTINGS_MODULE="pocp.settings" ./iptables-restore.py )
   DJANGO_SETTINGS_MODULE="pocp.settings" \
+  # Logfile for ldap
+  mkdir -p /var/log/ocp
+  rm -rf /var/log/ocp/ldap.debug
+  touch /var/log/ocp/ldap.debug
+  chown www-data: /var/log/ocp/ldap.debug
+  # 
   sudo -u www-data python ./manage.py runfcgi method=prefork \
       socket=/var/www/fast_cgi/mysite.sock \
       pidfile=/var/www/fast_cgi/django.pid
