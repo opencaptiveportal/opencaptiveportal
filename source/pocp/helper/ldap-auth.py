@@ -122,19 +122,19 @@ class ActiveDirectoryGroupMembershipSSLBackend:
 
          user.is_staff = False
          user.is_superuser = False
-         user.set_password('ldap authenticated')
+         user.set_password('ldap authenticated powered by SWITCH')
          user.save()
 
          # add user to default group
-         group=Group.objects.get(pk=1)
-         if debug:
-             print >>debug, group
-         if debug:
-             print >>debug, "add %s to group %s" % (username,group)
-         user.groups.add(group)
-         user.save()
-         if debug:
-             print >>debug, "successful group add"
+         #group=Group.objects.get(pk=1)
+         #if debug:
+         #    print >>debug, group
+         #if debug:
+         #    print >>debug, "add %s to group %s" % (username,group)
+         #user.groups.add(group)
+         #user.save()
+         #if debug:
+         #    print >>debug, "successful group add"
 
          if debug:
             debug.close()
