@@ -48,7 +48,7 @@ def delete_route(src_ip):
   import os
   # no while loop (is better...)
   try:
-    print os.system("""
+    os.system("""
         count=`/usr/bin/sudo /sbin/iptables -t mangle -nv --list PREROUTING | grep " %s " | wc -l`
         for i in `seq 1 $count`; do
           a=`/usr/bin/sudo /sbin/iptables --line-numbers -t mangle -nv --list PREROUTING | grep " %s " | cut -d" " -f 1 | head -n 1`;
@@ -78,11 +78,15 @@ def make_iptables(tmp_file = None):
   """
   from django.template.loader import render_to_string
   from pocp.ocp.models import provider, active_route
+  try:
+    from pocp.settings import GRE_TUNNEL_CONF
+  except:
+    GRE_TUNNEL_CONF = False
   import os
   try:
     from pocp.settings import EASY_MASQUERADE
   except:
-    EASY_MASQUERADE = ()
+    EASY_MASQUERADE = False
 
   # get provider GRE tunnel ids
   wisps = []
@@ -101,6 +105,7 @@ def make_iptables(tmp_file = None):
             'active_session':  active_sessions,
             'classic_acls':    fetch_switch_classic(),
             'EASY_MASQUERADE': EASY_MASQUERADE,
+            'conference_gre':  GRE_TUNNEL_CONF,
           } ).encode("utf-8")
 
   # Debug
