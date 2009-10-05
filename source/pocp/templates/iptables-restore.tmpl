@@ -46,11 +46,12 @@
 *nat
 :PREROUTING ACCEPT [0:0]
 :POSTROUTING ACCEPT [0:0] 
-{% for net in EASY_MASQUERADE %}
--A POSTROUTING -s {{ net }} -j MASQUERADE
-{% endfor %}
+{% if EASY_MASQUERADE %}
+-A POSTROUTING -o {{ EASY_MASQUERADE }} -j MASQUERADE
+{% endif %}
 :OUTPUT ACCEPT [0:0]
 
+-A PREROUTING ! -d 127.0.0.1/32 -p tcp -m tcp --dport 1443 -j DNAT --to-destination 127.0.0.1:1443
 ## For the Button from Monzoon:
 -A PREROUTING -d 192.168.0.0/16 -p tcp -m tcp --dport 80  -j REDIRECT
 -A PREROUTING -d 192.168.0.0/16 -p tcp -m tcp --dport 443 -j REDIRECT
@@ -59,6 +60,10 @@
 {% for wisp in wisps %}
 -A PREROUTING -m mark --mark {{ wisp.hexid }} -j ACCEPT
 {% endfor %}
+## For conference login
+{% if conference_gre %}
+-A PREROUTING -m mark --mark {{ conference_gre }} -j ACCEPT
+{% endif %}
 
 :SWITCHclassic - [0:0]
 ## Some special rules
@@ -147,6 +152,10 @@ COMMIT
 {% for wisp in wisps %}
 -A FORWARD -m mark --mark {{ wisp.hexid }} -j ACCEPT
 {% endfor %}
+## For conference login:
+{% if conference_gre %}
+-A FORWARD -m mark --mark {{ conference_gre }} -j ACCEPT
+{% endif %}
 
 ## Some special rules ... (why, oh why ?)
 :SWITCHclassic - [0:0]
@@ -175,6 +184,9 @@ COMMIT
 -A SWITCHclassic -d 130.59.13.14 -p tcp -m tcp --dport 22 -j ACCEPT 
 -A SWITCHclassic -d 130.59.10.51 -j ACCEPT 
 -A SWITCHclassic -s 130.59.95.31 -j ACCEPT 
+## NTB Website
+-A SWITCHclassic -d 146.136.1.0/24 -j ACCEPT
+
 
 ## The SWITCH classic ACLs (see http://www.switch.ch/mobile/classic/)
 {% for ace, desc in classic_acls %}
