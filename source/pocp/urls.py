@@ -31,10 +31,10 @@ urlpatterns = patterns('',
     (r'^service/ip/show',    'pocp.ocp.view_ip.show'),
     (r'^service/ip/rebuild', 'pocp.ocp.view_ip.rebuild'),
 
+    (r'^provider/dhcp.php', 'pocp.ocp.provider.dhcp'),
+
     (r'^admin-overview/', 'pocp.ocp.views.admin'),
 
-    (r'^provider/dhcp.php', 'pocp.ocp.provider.dhcp'),
-    
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:
