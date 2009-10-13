@@ -14,7 +14,7 @@ start () {
 #  PYTHONPATH=/path/to/the/django/project/ \ 
 #      /some/script/that/uses/the/django/environment.py
   cd /usr/local/pocp/
-  sudo -u www-data python ./xml-rpc-server.py &
+  sudo -u www-data sh -c "DJANGO_SETTINGS_MODULE='pocp.settings' python ./xml-rpc-server.py" &
   mpid="$!"
 
 
