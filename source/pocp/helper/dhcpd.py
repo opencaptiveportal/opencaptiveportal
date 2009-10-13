@@ -16,7 +16,7 @@ def parse_lease_file(lease_file, sorted = None):
       }
   """
   import re, sys
-  
+  import datetime, time
   # lease 10.4.154.93 {
   #   starts 4 2008/12/04 10:07:00;
   #   ends 4 2008/12/04 22:07:00;
@@ -43,32 +43,29 @@ def parse_lease_file(lease_file, sorted = None):
   text = text.replace('\n','')
   textl = text.split('}')
   
+  ll = {}
+  for i in textl:
+    if lease.match(i):
+      ip = lease.match(i).group('ip')
+      if not ll.has_key(ip):
+        # convert time to local time (in dhcp log is UTC)
+        # timezone beachtet nicht daylight saving time ...
+        start = ( datetime.datetime.strptime( lease.match(i).group('starts'), "%Y/%m/%d %H:%M:%S" ) \
+                  + datetime.timedelta( 0, time.altzone ) ).strftime("%Y/%m/%d %H:%M:%S") 
+        end   = ( datetime.datetime.strptime( lease.match(i).group('ends'), "%Y/%m/%d %H:%M:%S" ) \
+                  + datetime.timedelta( 0, time.altzone ) ).strftime("%Y/%m/%d %H:%M:%S")
+        ll[ip] = {'mac':   lease.match(i).group('mac'),
+                  'start': start,
+                  'end':   end,
+                 }
   if sorted == 'ip':
-    ll = {}
-    for i in textl:
-      if lease.match(i):
-        ip = lease.match(i).group('ip')
-        if not ll.has_key(ip):
-          # convert time to local time (in dhcp log is UTC)
-          # timezone beachtet nicht daylight saving time ...
-          start = ( datetime.datetime.strptime( lease.match(i).group('starts'), "%Y/%m/%d %H:%M:%S" ) \
-                    + datetime.timedelta( 0, time.altzone ) ).strftime("%Y/%m/%d %H:%M:%S") 
-          end   = ( datetime.datetime.strptime( lease.match(i).group('ends'), "%Y/%m/%d %H:%M:%S" ) \
-                    + datetime.timedelta( 0, time.altzone ) ).strftime("%Y/%m/%d %H:%M:%S")
-          ll[ip] = {'mac':   lease.match(i).group('mac'),
-                    'start': start,
-                    'end':   end,
-                   }
     return ll
   else:
-    ll = []
-    for i in textl:
-      if lease.match(i):
-        m = {'ip':    lease.match(i).group('ip'),
-             'mac':   lease.match(i).group('mac'),
-             'start': lease.match(i).group('starts'),
-             'end':   lease.match(i).group('ends'),
-            }
-        ll.append(m) 
-    return ll
+    # return list
+    lln = []
+    for ip in ll.keys():
+      tmp = ll[ ip ]
+      tmp['ip'] = ip
+      lln.append( tmp )
+    return lln
 
