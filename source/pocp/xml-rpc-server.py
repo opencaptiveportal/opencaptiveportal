@@ -173,7 +173,7 @@ def test(HandlerClass = SecureXMLRpcRequestHandler,ServerClass = SecureXMLRPCSer
           """
           Returns the status information of a client.
           @parameters:
-            ip: string, The IP Address of the client.
+            ip: string, The IPv4 address of the client.
           @returns:
             If Client is alive:
               dict: { 'alive':  Bool,   True,
@@ -249,7 +249,7 @@ def test(HandlerClass = SecureXMLRpcRequestHandler,ServerClass = SecureXMLRPCSer
           Stopps an active sessions.
           @parameters:
             handle:  string, The Authentication Handle (see /xmlrpc/authenticator.php -> login)
-            address: string, Address of the Session to stop.
+            address: string, IPv4 address of the Session to stop.
           @returns:
             Bool
           """
