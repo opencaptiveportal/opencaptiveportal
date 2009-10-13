@@ -10,7 +10,7 @@ def parse_lease_file(lease_file, sorted = None):
   @returns:
     list of dicts with
       {'ip':    <ip>,
-       'mac':   <<mac>,
+       'mac':   <mac>,
        'start': <start>,
        'end':   <end>,
       }
@@ -49,9 +49,15 @@ def parse_lease_file(lease_file, sorted = None):
       if lease.match(i):
         ip = lease.match(i).group('ip')
         if not ll.has_key(ip):
+          # convert time to local time (in dhcp log is UTC)
+          # timezone beachtet nicht daylight saving time ...
+          start = ( datetime.datetime.strptime( lease.match(i).group('starts'), "%y/%m/%d %H:%M:%S" ) \
+                    + datetime.timedelta( 0, time.altzone ) ).strftime("%y/%m/%d %H:%M:%S") 
+          end   = ( datetime.datetime.strptime( lease.match(i).group('ends'), "%y/%m/%d %H:%M:%S" ) \
+                    + datetime.timedelta( 0, time.altzone ) ).strftime("%y/%m/%d %H:%M:%S")
           ll[ip] = {'mac':   lease.match(i).group('mac'),
-                    'start': lease.match(i).group('starts'),
-                    'end':   lease.match(i).group('ends'),
+                    'start': start,
+                    'end':   end,
                    }
     return ll
   else:
