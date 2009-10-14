@@ -33,6 +33,7 @@ def parse_lease_file(lease_file, sorted = None):
   lease\ (?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}).*
   starts\ \d\ (?P<starts>\d{4}/\d{2}/\d{2}\ \d{2}:\d{2}:\d{2}).*
   ends\ \d\ (?P<ends>\d{4}/\d{2}/\d{2}\ \d{2}:\d{2}:\d{2}).*
+  binding\ state (?P<bstate>\w+).*
   hardware\ ethernet\ (?P<mac>([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}).*
   .*""", re.VERBOSE)
   
@@ -54,9 +55,10 @@ def parse_lease_file(lease_file, sorted = None):
                   + datetime.timedelta( 0, time.altzone ) ).strftime("%Y/%m/%d %H:%M:%S") 
         end   = ( datetime.datetime.strptime( lease.match(i).group('ends'), "%Y/%m/%d %H:%M:%S" ) \
                   + datetime.timedelta( 0, time.altzone ) ).strftime("%Y/%m/%d %H:%M:%S")
-        ll[ip] = {'mac':   lease.match(i).group('mac'),
-                  'start': start,
-                  'end':   end,
+        ll[ip] = {'mac':    lease.match(i).group('mac'),
+                  'bstate': lease.match(i).group('bstate'),
+                  'start':  start,
+                  'end':    end,
                  }
   if sorted == 'ip':
     return ll

@@ -19,12 +19,13 @@ def dhcp(request):
       ip: string, The IPv4 address of the client.
     @returns:
       If Client is alive:
-        string:  <client mac address> <client IPv4 address> 0.0.0.0 <starttime> <endtime> <lease time> ISSUED
+        string:  <client mac address> <client IPv4 address> 0.0.0.0 <starttime> <endtime> <lease time> <binding state>
         <client mac address>:  de:ad:ca:fe:af:fe 
         <client IPv4 address>: a.b.c.d 
         <starttime>:           yyyymmddhhmmss   # in UTC ???
         <stoptime>:            yyyymmddhhmmss   # in UTC ???
         <duration>:            in seconds 
+        <binding state>:       ISSUED           # if in ( "active", "free" )
     """
     ip = request.GET['ip']
     if ip is None:
@@ -39,7 +40,10 @@ def dhcp(request):
         for i in ( "/", " ", ":" ):
           row['start'] = row['start'].replace( i, "" )
           row['end']   = row['end'].replace(   i, "" )
-        return HttpResponse( "%(mac)s %(ip)s 0.0.0.0 %(start)s %(end)s 28800 ISSUED\n" % row, mimetype="text/plain" )
+        row['nbstate'] = "UNKNOWN"
+        if row['bstate'] in ( "active", "free" ):
+          row['nbstate'] = "ISSUED"
+        return HttpResponse( "%(mac)s %(ip)s 0.0.0.0 %(start)s %(end)s 28800 %(nbstate)s\n" % row, mimetype="text/plain" )
     return HttpResponse("Not Found\n", mimetype="text/plain")
 
 
