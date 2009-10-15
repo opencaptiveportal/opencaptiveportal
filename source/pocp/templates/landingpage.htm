@@ -27,8 +27,20 @@
  <style type="text/css">
 	<!--
 	table {
-	 font-size: 75.00%;
+	 font-size: 7pt;
  	}
+	input#id_username {
+		width: 10em;
+	}
+	input#id_password {
+		width: 10em;
+	}
+	.label {
+		font-size: 7pt;
+	}
+	.formtitle {
+		font-size: 7pt;
+	}
 	-->
  </style>
     <div id="page_margins">
@@ -57,7 +69,7 @@
               <li class="printing invisible">
                 <a href="#" title="Drucken"><span class="float_left">Drucken</span> <img src="http://www.switch.ch/switch-web/images/icons/icon_print.gif" alt="" class="icon_print" /></a>
               </li>
-              <li>
+              <!--li>
                 <a href="#" title="">de</a>
               </li>
               <li>|
@@ -74,9 +86,11 @@
               </li>
               <li class="last">
                 <a href="#" title="" class="current">en</a>
-              </li>
+              </li-->
             </ul>
           </div><a href="/" title="Start"><img src="http://www.switch.ch/switch-web/images/logo.gif" alt="SWITCH Logo" id="logo" /></a>
+	<div align="right"><a href="/back.php"><img src="/rsc/images/bu_back_provider.gif" alt="Back-Button" /></a><br />
+  Delete previous provider selection.</div>
           <!-- end: div topnav -->
         </div>
 	<!-- end: div header -->
@@ -106,7 +120,7 @@
  <td width=260 valign="top" bgcolor="white">
   <b>SWITCH<i>connect</i></b>
   <p><center><a href="http://www.switch.ch/mobile"><img src="http://www.switch.ch/img/Switch-connect-200.gif" border="0"></a></center></p>
-  If you are a SWITCH<i>connect</i> user start up your VPN client and connect to your home campus.
+  If you are a SWITCH<i>connect</i> user start up your VPN client and connect to your home campus. 
  </td>
  
  <!-- local university -->
@@ -114,7 +128,7 @@
   <table>
    <tr>
     <td>
-     <b>Conference Login</b><p>
+     <b class="formtitle">Conference Login</b><p>
 <!--     <iframe src="/login/" width="261" height="150" rolling="no" frameborder="0"></iframe> -->
 {% if no_cookies %}
 <p style="color: red;">Dein Browser unterstützt keine Cookies. Bitte aktivere sie um dich anzumelden.</p>
@@ -130,12 +144,11 @@
 <input type="submit" value="logout" />
 {% else %}
 <table border="0">
- <tr><td>Username:</td><td>{{ form.username }}</td></tr>
- <tr><td>Password:</td><td>{{ form.password }}</td></tr>
+ <tr><td class="label">Username:</td><td>{{ form.username }}</td></tr>
+ <tr><td class="label">Password:</td><td>{{ form.password }}</td></tr>
 </table>
 <input type="hidden" name="give_internet" value="true" />
 <input type="submit" value="login" /> <br /><br />
-(For administration please login via Conference Login.)<br />
 {% endif %}
 </form>
     </td>
@@ -157,7 +170,7 @@
  <td width=260 valign="top">
   <b>Free Links</b><p>
    <ul>
-    <li><a href="http://www.switch.ch">SWITCH</a></li > 
+    <li><a href="http://www.switch.ch" target="_blank">SWITCH</a></li > 
     <li><a href="http://www.sbb.ch">SBB</a> / <a href="http://www.zvv.ch">ZVV</a> / <a href="http://www.vbz.ch">VBZ</a></li>
    </ul>
   </td>
