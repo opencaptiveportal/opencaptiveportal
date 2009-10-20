@@ -11,29 +11,29 @@ admin.autodiscover()
 urlpatterns = patterns('',
     # Example:
     # (r'^pocp/', include('pocp.foo.urls')),
-    # css
+
+    # Static css and image stuff
+    # Change the directory to an absolute directory
     (r'^rsc/(?P<path>.*)$', 'django.views.static.serve',
             {'document_root': '/home/kleefass/pocp/templates/rsc/'}),
 
-    # landingpage:
-    (r'^back.php',  'pocp.ocp.views.back'),
-    (r'^route.php', 'pocp.ocp.views.route'),
-    (r'^index.php', 'pocp.ocp.views.landingpage'),
-    # TODO: Dumme Fehler wie dieses / am Anfang abfangen:
-    (r'^/route.php', 'pocp.ocp.views.route'),
-    (r'^pwlan/back.php',  'pocp.ocp.views.back'),
-    (r'^pwlan/route.php', 'pocp.ocp.views.route'),
-    (r'^pwlan/index.php', 'pocp.ocp.views.landingpage'),
+    # Landingpage:
+    (r'^/*back.php',            'pocp.ocp.views.back'),
+    (r'^/*route.php',           'pocp.ocp.views.route'),
+    (r'^/*index.php',           'pocp.ocp.views.landingpage'),
+    (r'^/*pwlan/+back.php',     'pocp.ocp.views.back'),
+    (r'^/*pwlan/+route.php',    'pocp.ocp.views.route'),
+    (r'^/*pwlan/+index.php',    'pocp.ocp.views.landingpage'),
 
     (r'^service/iptables/show',    'pocp.ocp.view_iptables.show'),
     (r'^service/iptables/rebuild', 'pocp.ocp.view_iptables.rebuild'),
     
-    (r'^service/ip/show',    'pocp.ocp.view_ip.show'),
-    (r'^service/ip/rebuild', 'pocp.ocp.view_ip.rebuild'),
+    (r'^service/ip/show',          'pocp.ocp.view_ip.show'),
+    (r'^service/ip/rebuild',       'pocp.ocp.view_ip.rebuild'),
 
-    (r'^provider/dhcp.php', 'pocp.ocp.provider.dhcp'),
+    (r'^provider/dhcp.php',        'pocp.ocp.provider.dhcp'),
 
-    (r'^admin-overview/', 'pocp.ocp.views.admin'),
+    (r'^admin-overview/',       'pocp.ocp.views.admin'),
 
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
@@ -44,6 +44,5 @@ urlpatterns = patterns('',
     (r'^admin/(.*)', admin.site.root),
 
     (r'^login/$',   'django.contrib.auth.views.login', {'template_name': 'login.htm'}),
-#    (r'',           'django.contrib.auth.views.login', {'template_name': 'landingpage.htm'}),
     (r'',           'pocp.ocp.views.landingpage'),
 )

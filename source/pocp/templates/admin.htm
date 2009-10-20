@@ -93,15 +93,6 @@
 <!-- Contenc -->
 <h1>Administration</h1>
 
-{% if no_cookies %}
-<p style="color: red;">Dein Browser unterstützt keine Cookies. Bitte aktivere sie um dich anzumelden.</p>
-{% endif %}
-
-{% if form.has_errors %}
-<p style="color: red;">Your username and password didn't match. Please try again.</p>
-{% endif %}
-
-{% if loggedin %}
 <p>
 <form method="post" action="/">
  You are logged in as {{ username }}.
@@ -133,12 +124,6 @@
   </ul>
 <br /><br />
 </p>
-
-{% else %}
-<p><a href="/">Login</a> on Fronpage.</a>
-{% endif %}
-
-
   </td>
  </tr>
 </table>

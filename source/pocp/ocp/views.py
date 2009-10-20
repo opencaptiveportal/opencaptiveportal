@@ -7,19 +7,21 @@
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.decorators import login_required
 
-## IMPORTANT TODO
-## The admin stuff is very alpha, e.g. there is no real auth, CHECK THAT bevor commit !!1!
+
+# For all views, check that there is an authentication
+@login_required
 def admin(request):
   """
   Overview for the Administrators
   """
-  loggedin = False
-  if str(request.user) != "AnonymousUser":
-    loggedin = True
+  if not request.user.is_staff:
+    return render_to_response('error.htm', {
+        'error': "Sorry, you are not staff... (user permissions 'is_staff')",
+      })
   return render_to_response('admin.htm', {
       'username': request.user,
-      'loggedin': loggedin,
     })
 
 def del_active_route(src_ip):
