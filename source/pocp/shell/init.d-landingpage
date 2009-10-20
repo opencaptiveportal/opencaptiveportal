@@ -3,66 +3,83 @@
 # This init.d Script is to start the python daemon, which answers the fastcgi
 # requests
 
+. /lib/lsb/init-functions
+
 # Only as root executable
 if [ $UID != 0 ]; then
   echo "Error: $0 must be executed as user root!"
   exit 2
 fi
 
-start () {
-#  PYTHONPATH=/path/to/the/django/project/ \ 
-#      /some/script/that/uses/the/django/environment.py
-  mkdir -p           /tmp/landingpage/
-  chown -R www-data: /tmp/landingpage/
+# Configuration
+DESC="Open Captive Portal"
+NAME="pocp"
+OCPPIDFILE=/var/www/fast_cgi/django.pid
+OCPUSER="www-data"
+
+start() {
+  # Environment for http server
   mkdir -p           /var/www/fast_cgi/
   chown -R www-data: /var/www/fast_cgi/
-  cd /usr/local/pocp/ || { echo "Could not changedir to /usr/local/pocp/"; exit 9; }
   ( cd shell && DJANGO_SETTINGS_MODULE="pocp.settings" ./iptables-restore.py )
-  DJANGO_SETTINGS_MODULE="pocp.settings" \
   # Logfile for ldap
-  mkdir -p /var/log/ocp
-  rm -rf /var/log/ocp/ldap.debug
-  touch /var/log/ocp/ldap.debug
+  mkdir -p        /var/log/ocp
+  rm -rf          /var/log/ocp/ldap.debug
+  touch           /var/log/ocp/ldap.debug
   chown www-data: /var/log/ocp/ldap.debug
-  # 
+  # Environment for django service
+  cd /usr/local/pocp/ || { echo "Could not changedir to /usr/local/pocp/"; exit 9; }
+  DJANGO_SETTINGS_MODULE="pocp.settings" 
+  log_daemon_msg "Starting $DESC" "$NAME"
   sudo -u www-data python ./manage.py runfcgi method=prefork \
       socket=/var/www/fast_cgi/mysite.sock \
       pidfile=/var/www/fast_cgi/django.pid
+  # Does not work with start-stop-daemon, why?
+  #start-stop-daemon --start --quiet  \
+  #  --chdir /usr/local/pocp/  \
+  #  --chuid $OCPUSER  \
+  #  --pidfile $OCPPIDFILE  \
+  #  --exec ./manage.py -- runfcgi method=prefork \   
+  #                     socket=/var/www/fast_cgi/mysite.sock  \
+  #                     pidfile=$OCPPIDFILE
+  sleep 2
 
-  if [ "`ps aux | grep "python ./manage.py runfcgi method=prefork" | \
-          grep -v "grep python" | wc -l`" -gt 0 ]; then
-    echo "                                                  [ done ]"
-    exit 0
+  if check_status -q; then
+    log_end_msg 0
   else
-    echo "                                                  [*fail*]"
-    exit 9
+    log_failure_msg "check syslog for diagnostics."
+    log_end_msg 1
+    exit 1
   fi
 }
 
-stop () {
-  if [ -f /var/www/fast_cgi/django.pid  ]; then
-    kill `cat /var/www/fast_cgi/django.pid`;
-    mret=$?;
-    rm -f /var/www/fast_cgi/django.pid;
+check_status() {
+  if [ ! -r "$OCPPIDFILE" ]; then
+    test "$1" != -v || echo "$NAME is not running."
+    return 3
   fi
-  if [ $? -ne 0 ]; then
-      ps aux | grep "python ./manage.py runfcgi method=prefork" | \
-      perl -p -i -e 's#[\ ]+# #g' | cut -d " " -f 2 | \
-      perl -p -i -e 's#\n# #g' | xargs kill -9
+  if read pid < "$OCPPIDFILE" && ps -p "$pid" > /dev/null 2>&1; then
+    test "$1" != -v || echo "$NAME is running."
+    return 0
+  else
+    test "$1" != -v || echo "$NAME is not running but $OCPPIDFILE exists."
+    return 1
   fi
+}
+
+stop() {
+  log_daemon_msg "Stopping $DESC" "$NAME"
+  start-stop-daemon --stop --quiet --pidfile $OCPPIDFILE
+  log_end_msg $?
+  rm -f "$OCPPIDFILE"
 }
 
 
 if [ "$1" == "start" ]; then
-  echo -n "Starting landingpage ...   "
   start
 elif [ "$1" == "stop" ]; then
-  echo -n "Stopping landingpage ...   "
   stop
-  echo "                                                  [ done ]"
-  exit 0
 elif [ "$1" == "restart" ]; then
-  echo -n "Restarting landingpage ... "
   stop || true
   sleep 1
   start
