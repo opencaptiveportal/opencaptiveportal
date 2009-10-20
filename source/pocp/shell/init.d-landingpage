@@ -29,11 +29,10 @@ start() {
   chown www-data: /var/log/ocp/ldap.debug
   # Environment for django service
   cd /usr/local/pocp/ || { echo "Could not changedir to /usr/local/pocp/"; exit 9; }
-  DJANGO_SETTINGS_MODULE="pocp.settings" 
   log_daemon_msg "Starting $DESC" "$NAME"
-  sudo -u www-data python ./manage.py runfcgi method=prefork \
+  sudo -u www-data sh -c "DJANGO_SETTINGS_MODULE='pocp.settings' python ./manage.py runfcgi method=prefork \
       socket=/var/www/fast_cgi/mysite.sock \
-      pidfile=/var/www/fast_cgi/django.pid
+      pidfile=/var/www/fast_cgi/django.pid"
   # Does not work with start-stop-daemon, why?
   #start-stop-daemon --start --quiet  \
   #  --chdir /usr/local/pocp/  \

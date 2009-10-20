@@ -2,7 +2,7 @@
 
 # This init.d Script is to start the XML RPC daemon
 
-PIDFILE=/var/run/ocp-xml-rpc.pid
+. /lib/lsb/init-functions
 
 # Only as root executable
 if [ $UID != 0 ]; then
@@ -10,46 +10,40 @@ if [ $UID != 0 ]; then
   exit 2
 fi
 
-start () {
-#  PYTHONPATH=/path/to/the/django/project/ \ 
-#      /some/script/that/uses/the/django/environment.py
+# Configuration
+DESC="Open Captive Portal XML-RPC Daemon"
+NAME="xml-rpc-server.py"
+PIDFILE=/var/run/ocp-xml-rpc.pid
+
+start() {
+  # Environment for XML-RPC daemon
   cd /usr/local/pocp/
+  log_daemon_msg "Starting $DESC" "$NAME"
   sudo -u www-data sh -c "DJANGO_SETTINGS_MODULE='pocp.settings' python ./xml-rpc-server.py" &
   mpid="$!"
 
-
-  if [ "`ps -a $mpid | wc -l`" -gt 1 ]; then
+  if ps -p "$mpid" > /dev/null 2>&1; then
     echo "$mpid" > $PIDFILE
-    echo "                                                  [ done ]"
-    exit 0
+    log_end_msg 0
   else
-    echo "                                                  [*fail*]"
-    exit 9
+    log_failure_msg "check syslog for diagnostics."
+    log_end_msg 1
   fi
 }
 
-stop () {
-  kill `cat $PIDFILE`
-  if [ $? -eq 0 ]; then
-    rm -f $PIDFILE
-    echo "                                                  [ done ]"
-    exit 0
-  else
-    echo "                                                  [*fail*]"
-    exit 9
-  fi
-
+stop() {
+  log_daemon_msg "Stopping $DESC" "$NAME"
+  start-stop-daemon --stop --quiet --pidfile $PIDFILE
+  log_end_msg $?
+  rm -f "$PIDFILE"
 }
 
 
 if [ "$1" == "start" ]; then
-  echo -n "Starting xml-rpc server ...   "
   start
 elif [ "$1" == "stop" ]; then
-  echo -n "Stoppin xml-rpc server  ...   "
   stop
 elif [ "$1" == "restart" ]; then
-  echo -n "Restartin xml-rpc server  ... "
   stop || true
   sleep 1
   start
