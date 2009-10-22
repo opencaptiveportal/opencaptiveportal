@@ -1,4 +1,4 @@
-/var/log/pocp/* {
+/var/log/pocp/*.log {
 	daily
 	missingok
 	rotate 14
