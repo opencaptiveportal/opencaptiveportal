@@ -1,0 +1,9 @@
+/var/log/pocp/* {
+	daily
+	missingok
+	rotate 14
+	compress
+	delaycompress
+	create 660 www-data www-data
+}
+

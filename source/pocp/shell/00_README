@@ -11,3 +11,5 @@ Configure the init.d scripts to start after booting the system:
 > sudo ln -s /usr/local/pocp/shell/init.d-xml-rpc /etc/init.d/pocp-xml-rpc
 > sudo update-rc.d pocp-xml-rpc defaults
 
+Logrotate:
+> sudo ln -s /usr/local/pocp/shell/logrotate /etc/logrotate.d/pocp
