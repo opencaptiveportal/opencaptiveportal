@@ -83,6 +83,15 @@ check_status() {
 }
 
 stop() {
+  # Delete GRE tunnels and ip rules
+  log_daemon_msg "Reloading iptables" "rules-delete.py"
+  ./shell/django-python.sh ./rules-delete.py
+  if [ "$?" -eq 0 ]; then
+    log_end_msg 0
+  else
+    log_end_msg 1
+  fi
+  # Stop landingpage
   log_daemon_msg "Stopping $DESC" "$NAME"
   start-stop-daemon --stop --quiet --pidfile $OCPPIDFILE
   log_end_msg $?
