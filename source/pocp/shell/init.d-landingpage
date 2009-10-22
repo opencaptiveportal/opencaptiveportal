@@ -21,7 +21,6 @@ start() {
   # Environment for http server
   mkdir -p           /var/www/fast_cgi/
   chown -R www-data: /var/www/fast_cgi/
-  ( cd shell && DJANGO_SETTINGS_MODULE="pocp.settings" ./iptables-restore.py )
   # Logfile for ldap
   mkdir -p        /var/log/ocp
   rm -rf          /var/log/ocp/ldap.debug
@@ -29,6 +28,15 @@ start() {
   chown www-data: /var/log/ocp/ldap.debug
   # Environment for django service
   cd /usr/local/pocp/ || { echo "Could not changedir to /usr/local/pocp/"; exit 9; }
+  # Reload iptables
+  log_daemon_msg "Reloading iptables" "iptables-restore.py"
+  ./shell/django-python.sh ./iptables-restore.py
+  if [ "$?" -eq 0 ]; then
+    log_end_msg 0
+  else
+    log_end_msg 1
+  fi
+  # Start landingpage daemon
   log_daemon_msg "Starting $DESC" "$NAME"
   sudo -u www-data sh -c "DJANGO_SETTINGS_MODULE='pocp.settings' python ./manage.py runfcgi method=prefork \
       socket=/var/www/fast_cgi/mysite.sock \
