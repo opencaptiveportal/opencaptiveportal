@@ -2,6 +2,12 @@
 Some shell scripts to start and stop the necessary daemons and/or other things
 like iptables.
 
+Start a script in the shell directory manually:
+> sudo sh -c 'DJANGO_SETTINGS_MODULE="pocp.settings" ./iptables-restore.py '
 
-sudo sh -c 'DJANGO_SETTINGS_MODULE="pocp.settings" ./iptables-restore.py '
+Configure the init.d scripts to start after booting the system:
+> sudo ln -s /usr/local/pocp/shell/init.d-landingpage /etc/init.d/pocp-landingpage
+> sudo update-rc.d pocp-landingpage defaults
+> sudo ln -s /usr/local/pocp/shell/init.d-xml-rpc /etc/init.d/pocp-xml-rpc
+> sudo update-rc.d pocp-xml-rpc defaults
 
