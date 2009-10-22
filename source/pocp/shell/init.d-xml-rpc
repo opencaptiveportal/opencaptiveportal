@@ -21,7 +21,7 @@ fi
 # Configuration
 DESC="Open Captive Portal XML-RPC Daemon"
 NAME="xml-rpc-server.py"
-PIDFILE=/var/run/ocp-xml-rpc.pid
+PIDFILE=/var/run/pocp-xml-rpc.pid
 
 start() {
   # Environment for XML-RPC daemon

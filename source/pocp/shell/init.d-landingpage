@@ -30,10 +30,10 @@ start() {
   mkdir -p           /var/www/fast_cgi/
   chown -R www-data: /var/www/fast_cgi/
   # Logfile for ldap
-  mkdir -p        /var/log/ocp
-  rm -rf          /var/log/ocp/ldap.debug
-  touch           /var/log/ocp/ldap.debug
-  chown www-data: /var/log/ocp/ldap.debug
+  mkdir -p        /var/log/pocp
+  rm -rf          /var/log/pocp/ldap.debug.log
+  touch           /var/log/pocp/ldap.debug.log
+  chown www-data: /var/log/pocp/ldap.debug.log
   # Environment for django service
   cd /usr/local/pocp/ || { echo "Could not changedir to /usr/local/pocp/"; exit 9; }
   # Reload iptables

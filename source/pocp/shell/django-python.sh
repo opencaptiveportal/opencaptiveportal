@@ -2,7 +2,7 @@
 
 # Wrapper for djangp python scripts (settings module)
 
-LOG=/var/log/ocp/django-python.log
+LOG=/var/log/pocp/django-python.log
 
 # Find out our working directory
 THIS=$0

@@ -134,6 +134,6 @@ AD_SEARCH_FIELDS= ['mail','givenName','sn','sAMAccountName','memberOf']
 AD_MEMBERSHIP_REQ=['Users']
 AD_CERT_FILE='/dummy/path/muss/hier/stehen.txt'
 AD_DEBUG=True
-AD_DEBUG_FILE='/var/log/ocp/ldap.debug'
+AD_DEBUG_FILE='/var/log/pocp/ldap.debug.log'
 
 ########################################################################
