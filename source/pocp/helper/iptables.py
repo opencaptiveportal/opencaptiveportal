@@ -77,7 +77,7 @@ def make_iptables(tmp_file = None):
       pocp/templates/iptables-restore.tmpl
   """
   from django.template.loader import render_to_string
-  from pocp.ocp.models import provider, active_route
+  from pocp.ocp.models import provider, active_route, active_conf
   try:
     from pocp.settings import GRE_TUNNEL_CONF
   except:
@@ -94,10 +94,12 @@ def make_iptables(tmp_file = None):
     wisps.append( { 'id':    p.gre_tunnel,
                     'hexid': hex(p.gre_tunnel) } )
 
-  # get active routes
+  # get active routes and active conferences
   active_sessions = []
   for p in active_route.objects.all():
     active_sessions.append( ( p.src_ip, p.provider.gre_tunnel ) )
+  for p in active_conf.objects.all():
+    active_sessions.append( ( p.src_ip, GRE_TUNNEL_CONF ) )
 
   # replace variables in template file
   iptables_restore = render_to_string(IPTABLES_TMP_FILE, 
