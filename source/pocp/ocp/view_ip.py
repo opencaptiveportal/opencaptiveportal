@@ -2,7 +2,7 @@
 #  -*- coding: UTF-8 -*-
 # vim: set fileencoding=UTF-8 :
 
-from pocp.helper.ip import make_gre_tunnel
+from pocp.helper.ip import create_all_gre
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.forms import AuthenticationForm
@@ -35,6 +35,6 @@ def rebuild(request):
     return render_to_response('error.htm', {
         'error': "Sorry, you are not staff... (user permissions 'is_staff')",
       })
-  make_gre_tunnel()
+  create_all_gre()
   return show(request)
 
