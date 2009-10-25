@@ -69,8 +69,9 @@ def landingpage(request):
   """
   from pocp.ocp.models import provider, round_robin
   from random import random
-  # User-Agent: iPassConnect (iPass)
+  # User-Agent
   if request.META.has_key('HTTP_USER_AGENT'):
+     # iPassConnect (iPass) 
     if request.META['HTTP_USER_AGENT'] == 'iPassConnect':
       src_ip  = request.META['REMOTE_ADDR']
       # Round Robin for WISP
