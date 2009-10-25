@@ -83,6 +83,8 @@ check_status() {
 }
 
 stop() {
+  # Environment for django service
+  cd /usr/local/pocp/ || { echo "Could not changedir to /usr/local/pocp/"; exit 9; }
   # Delete GRE tunnels and ip rules
   log_daemon_msg "Reloading iptables" "rules-delete.py"
   ./shell/django-python.sh ./rules-delete.py
