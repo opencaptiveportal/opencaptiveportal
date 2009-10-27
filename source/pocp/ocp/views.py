@@ -69,7 +69,8 @@ def landingpage(request):
   """
   from pocp.ocp.models import provider, round_robin
   from random import random
-  # User-Agent
+  import settings
+  # User-Agents
   if request.META.has_key('HTTP_USER_AGENT'):
      # iPassConnect (iPass) 
     if request.META['HTTP_USER_AGENT'] == 'iPassConnect':
@@ -85,10 +86,9 @@ def landingpage(request):
       # Add and save new route
       add_active_route(src_ip = src_ip, prov = prov)
       return render_to_response('ipass.htm', {})
-  # /User-Agent
+  # /User-Agents
 
   # See django.contrib.auth.views, login:
-  redirect_to = '/'
   loggedin = False
   if str(request.user) != "AnonymousUser":
     loggedin = True
@@ -106,10 +106,14 @@ def landingpage(request):
       return HttpResponseRedirect('/')
     if form.is_valid():
       # Light security check -- make sure redirect_to isn't garbage.
-      if not redirect_to or '//' in redirect_to or ' ' in redirect_to:
-        redirect_to = settings.LOGIN_REDIRECT_URL
-      # Set URL; TODO: the path does not work with apache2 and fast_cgi, why ?
-      redirect_to = request.build_absolute_uri( request.get_full_path() )
+      #DEBUG if not redirect_to or '//' in redirect_to or ' ' in redirect_to:
+        #DEBUG print "DEBUG(2): redirect_to:", redirect_to
+        #DEBUG redirect_to = settings.LOGIN_REDIRECT_URL
+      #redirect_to = '/'
+      # save originial URL to redirect there later
+      # TODO: the path does not work with apache2 and fast_cgi, why ?
+      redirect_to = request.build_absolute_uri(request.META['PATH_INFO'])
+      # 
       from django.contrib.auth import login
       login(request, form.get_user())
       # If the user wants internet (he is coming from the landingepage and not
@@ -128,6 +132,9 @@ def landingpage(request):
       if request.session.test_cookie_worked():
         request.session.delete_test_cookie()
       return HttpResponseRedirect(redirect_to)
+      #return render_to_response('error.htm', {
+      #    'error': redirect_to,
+      #  })
   else:
     form = AuthenticationForm(request)
   request.session.set_test_cookie()
@@ -194,7 +201,7 @@ def back(self):
   """
   Delete _ALL_ routes for src_ip
   """
-  from pocp.ocp.models import active_route
+  from pocp.ocp.models import active_route, active_conf
 
   if not (self.META.has_key('REMOTE_ADDR')):
     return render_to_response('error.htm', {
@@ -207,6 +214,11 @@ def back(self):
     a = active_route.objects.get(src_ip = src_ip)
     a.delete()
   except active_route.DoesNotExist:
+    pass
+  try:
+    a = active_conf.objects.get(src_ip = src_ip)
+    a.delete()
+  except active_conf.DoesNotExist:
     pass
 
   return HttpResponseRedirect('/index.php')

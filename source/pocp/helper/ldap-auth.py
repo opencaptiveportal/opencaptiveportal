@@ -11,6 +11,8 @@ import settings
 import ldap 
 import sys
 
+LDAP_TMP_GROUP = "ldap-tmp-users"
+
 try:
   DEBUG = settings.AD_DEBUG
 except:
@@ -110,11 +112,11 @@ class ActiveDirectoryGroupMembershipSSLBackend:
     import random
     user.set_password( str( random.random() ) )
     user.save()
-    # add user to "ldap" group
+    # add user to a temporary group, so that we can delete them later
     try:
-      group = Group.objects.get(name = "ldap")
+      group = Group.objects.get(name = LDAP_TMP_GROUP)
     except:
-      group = Group(name = "ldap")
+      group = Group(name = LDAP_TMP_GROUP)
       group.save()
     if DEBUG:
       print "ldap-auth:  group:", group
