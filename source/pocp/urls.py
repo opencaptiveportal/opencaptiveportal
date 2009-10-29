@@ -15,7 +15,7 @@ urlpatterns = patterns('',
     # Static css and image stuff
     # Change the directory to an absolute directory
     (r'^rsc/(?P<path>.*)$', 'django.views.static.serve',
-            {'document_root': '/home/kleefass/pocp/templates/rsc/'}),
+            {'document_root': '/usr/local/pocp/templates/rsc/'}),
 
     # Landingpage:
     (r'^/*back.php',            'pocp.ocp.views.back'),
