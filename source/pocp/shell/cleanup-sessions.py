@@ -35,5 +35,11 @@ transaction.commit_unless_managed()
 #     SELECT * from auth_user_groups u join auth_group g on (u.group_id = g.id) where g.name = 'ldap';
 
 from django.contrib.auth.models import User, Group
-User.objects.filter( groups__name = "ldap", last_login__lt = datetime.datetime.now() - datetime.timedelta( 7 ) ).delete()
+import settings
+try:
+  LDAP_TMP_GROUP = settings.LDAP_TMP_GROUP
+except:
+  LDAP_TMP_GROUP = "ldap-tmp-users"
+
+User.objects.filter( groups__name = LDAP_TMP_GROUP, last_login__lt = datetime.datetime.now() - datetime.timedelta( 7 ) ).delete()
 

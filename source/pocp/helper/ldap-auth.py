@@ -11,7 +11,10 @@ import settings
 import ldap 
 import sys
 
-LDAP_TMP_GROUP = "ldap-tmp-users"
+try:
+  LDAP_TMP_GROUP = settings.LDAP_TMP_GROUP
+except:
+  LDAP_TMP_GROUP = "ldap-tmp-users"
 
 try:
   DEBUG = settings.AD_DEBUG
