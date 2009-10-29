@@ -87,26 +87,26 @@ class ActiveDirectoryGroupMembershipSSLBackend:
       return None
     # Get additional information to the found result
     # get email
-    mail = None
+    mail = "noreply@localhost.local"
     if result.has_key('mail'):
       mail = result['mail'][0]
     if DEBUG:
       print "ldap-auth:  email:", mail
     # get surname
-    last_name = None
+    last_name = "LDAP"
     if result.has_key('sn'):
       last_name = result['sn'][0]
     if DEBUG:
       print "ldap-auth:  sn=%s" % last_name
     # get display name
-    first_name = None
+    first_name = "LDAP"
     if result.has_key('givenName'):
       first_name = result['givenName'][0]
     if DEBUG:
       print "ldap-auth:  first_name=%s" % first_name
     l.unbind_s()
     # Create and save user
-    user = User(username=username,first_name=first_name,last_name=last_name,email=mail)
+    user = User(username=username, first_name=first_name, last_name=last_name, email=mail)
     user.is_staff     = False
     user.is_superuser = False
     import random
