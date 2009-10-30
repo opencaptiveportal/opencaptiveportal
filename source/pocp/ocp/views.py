@@ -71,6 +71,9 @@ def landingpage(request):
   from random import random
   import settings
   # User-Agents
+  # TODO:
+  # - We have more User-Agents than iPass (get them from the database)
+  # - Calculate the round robin deppending if the WISP has the User-Agent
   if request.META.has_key('HTTP_USER_AGENT'):
      # iPassConnect (iPass) 
     if request.META['HTTP_USER_AGENT'] == 'iPassConnect':
@@ -88,12 +91,31 @@ def landingpage(request):
       return render_to_response('ipass.htm', {})
   # /User-Agents
 
+  # HTTPS and redirect
+  # If not HTTPS, redirect to HTTPS on this machine
+  import socket
+  fqdn = socket.getfqdn()
+  redirect_to = request.build_absolute_uri(request.META['PATH_INFO'])
+  if not request.META.has_key( "HTTPS" ):
+    return HttpResponseRedirect('https://%s/?url=%s' % (  fqdn, redirect_to ))
+  else:
+    if fqdn in redirect_to:
+      try: 
+        redirect_to = settings.LOGIN_REDIRECT_URL
+      except:
+        redirect_to = '/'
+      if request.GET.has_key( "url" ):
+        redirect_to = request.GET[ "url" ]
+      if request.POST.has_key( "url" ):
+        redirect_to = request.POST[ "url" ]
+  # /HTTPS and redirect
   # See django.contrib.auth.views, login:
   loggedin = False
   if str(request.user) != "AnonymousUser":
     loggedin = True
   if request.method == "POST":
     form = AuthenticationForm(data=request.POST)
+    # User logout
     if str(request.user) != "AnonymousUser":
       from django.contrib.auth.views import logout
       # Delete active conf
@@ -104,16 +126,8 @@ def landingpage(request):
         pass
       logout(request, '/')
       return HttpResponseRedirect('/')
+    # User login
     if form.is_valid():
-      # Light security check -- make sure redirect_to isn't garbage.
-      #DEBUG if not redirect_to or '//' in redirect_to or ' ' in redirect_to:
-        #DEBUG print "DEBUG(2): redirect_to:", redirect_to
-        #DEBUG redirect_to = settings.LOGIN_REDIRECT_URL
-      #redirect_to = '/'
-      # save originial URL to redirect there later
-      # TODO: the path does not work with apache2 and fast_cgi, why ?
-      redirect_to = request.build_absolute_uri(request.META['PATH_INFO'])
-      # 
       from django.contrib.auth import login
       login(request, form.get_user())
       # If the user wants internet (he is coming from the landingepage and not
@@ -131,19 +145,27 @@ def landingpage(request):
           pass
       if request.session.test_cookie_worked():
         request.session.delete_test_cookie()
-      return HttpResponseRedirect(redirect_to)
+      #User url redirect does not work because of Browser cache (?)
+      #return HttpResponseRedirect(redirect_to)
+      return HttpResponseRedirect( "http://www.google.ch/" )
+      #response = HttpResponse()
+      #response.status_code = 302  # redirection
+      #response['Pragma']   = 'no-cache'
+      #response['Location'] = redirect_to
+      #return response
       #return render_to_response('error.htm', {
       #    'error': redirect_to,
       #  })
   else:
     form = AuthenticationForm(request)
   request.session.set_test_cookie()
+
+  # iFrame stuff for WISPs
   url = None
   if request.GET.has_key('url'):
     url = request.GET['url']
   else:
     url = request.build_absolute_uri()
-
   # Round Robin for WISP
   provs = []
   for prov in round_robin.objects.all():
@@ -170,6 +192,7 @@ def landingpage(request):
       'loggedin': loggedin,
       'form':     form,
       'wisps':    sorted_provs,
+      'url':      url,
     })
 
 
