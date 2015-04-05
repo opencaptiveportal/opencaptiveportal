@@ -5,7 +5,7 @@
 ## | For further information please see                        |
 ## |    https://github.com/opencaptiveportal/opencaptiveportal |
 ## | or                                                        |
-## |    http://www.switch.ch/mobile/pwlan/                     |
+## |    https://www.switch.ch/connect/features/pwlan/          |
 ## +-----------------------------------------------------------+
 ## 
 ## Python cheetah template file for make-iptables.py 
@@ -84,7 +84,7 @@
 -A SWITCHclassic -d 130.59.10.51 -j ACCEPT 
 -A SWITCHclassic -s 130.59.95.31 -j ACCEPT 
 
-## The SWITCH classic ACLs (see http://www.switch.ch/mobile/classic/)
+## The SWITCH classic ACLs (see https://www.switch.ch/connect/features/classic/)
 #for ($ace, $desc) in $classic_acls:
 -A SWITCHclassic -d $ace -j ACCEPT
 #end for
@@ -163,7 +163,7 @@ COMMIT
 -A SWITCHclassic -d 130.59.10.51 -j ACCEPT 
 -A SWITCHclassic -s 130.59.95.31 -j ACCEPT 
 
-## The SWITCH classic ACLs (see http://www.switch.ch/mobile/classic/)
+## The SWITCH classic ACLs (see https://www.switch.ch/connect/features/classic/)
 #for ($ace, $desc) in $classic_acls:
 -A SWITCHclassic -d $ace -j ACCEPT
 #end for

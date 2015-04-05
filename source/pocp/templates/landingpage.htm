@@ -6,7 +6,7 @@
 # | For further information please see                        |
 # |    https://github.com/opencaptiveportal/opencaptiveportal |
 # | or                                                        |
-# |    http://www.switch.ch/mobile/pwlan/                     |
+# |    https://www.switch.ch/connect/features/pwlan/          |
 # +-----------------------------------------------------------+
 #
 # TODO:

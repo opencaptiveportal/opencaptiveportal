@@ -146,7 +146,7 @@ def show_iptables():
 def fetch_switch_classic(url = SWITCHclassic_url):
   """
   Fetch the SWITCHConnect Classic ACLs.
-  For more information see: https://www.switch.ch/mobile/classic/
+  For more information see: https://www.switch.ch/connect/features/classic/
   @params:
     url:   URL to the SWITCHConnect Classic ACLs.
   @return:
