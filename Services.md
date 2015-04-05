@@ -1,6 +1,6 @@
 This page gives an overview of the services and daemons, which have to run on the opencaptiveportal server.
 
-![![](http://opencaptiveportal.googlecode.com/svn/trunk/doc/OpenCaptivePortal-Software_small.png)](http://opencaptiveportal.googlecode.com/svn/trunk/doc/OpenCaptivePortal-Software.png)
+![![](https://raw.githubusercontent.com/opencaptiveportal/opencaptiveportal/master/doc/OpenCaptivePortal-Software_small.png)](https://raw.githubusercontent.com/opencaptiveportal/opencaptiveportal/master/doc/OpenCaptivePortal-Software.png)
 
 The services are divided into "packages", but interact.
 The following daemons must be installed and configured.
@@ -15,7 +15,7 @@ Table of contents:
 
 The iptables have two functions:
 
-  * Allow VPN connections to the Universities ([SWITCHconnect Classic](http://www.switch.ch/mobile/classic/))
+  * Allow VPN connections to the Universities ([SWITCHconnect Classic](https://www.switch.ch/connect/features/classic/))
   * If a user has selected a WISP (wlan Internet Service Provider) by clicking on an iframe, the following packets will be marked in iptables (with the MARK target). With policy based routing we can then route these packets based on the MARK through a specific GRE tunnel. Each WISP has an own GRE tunnel.
 
 The iptables are build with a template file within the django framework. When booting the machine, the hole iptables have to be created and applied. When a user clicks on an iframe to establish a connection to a WISP, only one iptables rule is added. This is done with django (see "landing page").

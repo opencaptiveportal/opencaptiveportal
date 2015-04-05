@@ -1,15 +1,15 @@
 # Introduction #
 
-This project aims at creating a captive portal framework mainly for public wireless networks within the [SWITCH PWLAN](http://www.switch.ch/mobile/pwlan/) project. The portal supports multiple uplink providers. It is mainly based on iptables and a web application.
+This project aims at creating a captive portal framework mainly for public wireless networks within the [SWITCH PWLAN](https://www.switch.ch/connect/features/pwlan/) project. The portal supports multiple uplink providers. It is mainly based on iptables and a web application.
 
 
 # Contact #
 
 Mailing list: ocp-dev (et) switch.ch (also for questions)
 
-Google Code Site: http://code.google.com/p/opencaptiveportal/
+GitHub Site: https://github.com/opencaptiveportal/opencaptiveportal/
 
-SWITCH PWLAN Site: http://www.switch.ch/mobile/pwlan/
+SWITCH PWLAN Site: https://www.switch.ch/connect/features/pwlan/
 
 If you are searching for a commercial supported version, please see
 http://www.wlan-partner.com/hotspot-loesungen/wlan-access-portal/
