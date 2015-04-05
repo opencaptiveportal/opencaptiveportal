@@ -1,15 +1,15 @@
 #!/usr/bin/python2.4
-#  -*- coding: UTF-8 -*-
+#  -*- coding: utf-8 -*-
 # vim: set fileencoding=UTF-8 tabstop=4 shiftwidth=4 expandtab :
 # 
-# +------------------------------------------------+
-# | OpenCaptivePortal                              |
-# |                                                |
-# | For further information please see             |
-# |    http://code.google.com/p/opencaptiveportal/ |
-# | or                                             |
-# |    http://www.switch.ch/mobile/pwlan/          |
-# +------------------------------------------------+
+# +-----------------------------------------------------------+
+# | OpenCaptivePortal                                         |
+# |                                                           |
+# | For further information please see                        |
+# |    https://github.com/opencaptiveportal/opencaptiveportal |
+# | or                                                        |
+# |    http://www.switch.ch/mobile/pwlan/                     |
+# +-----------------------------------------------------------+
 # 
 
 # This scripts downloads the SWITCHclassic ACls 

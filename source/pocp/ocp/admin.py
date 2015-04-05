@@ -1,5 +1,5 @@
 #!/usr/bin/python
-#  -*- coding: UTF-8 -*-
+#  -*- coding: utf-8 -*-
 # vim: set fileencoding=UTF-8 :
 
 from pocp.ocp.models import active_route, active_conf, provider, round_robin, user_agent

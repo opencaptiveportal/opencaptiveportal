@@ -1,5 +1,5 @@
 #!/usr/bin/python
-#  -*- coding: UTF-8 -*-
+#  -*- coding: utf-8 -*-
 # vim: set fileencoding=UTF-8 :
 
 from pocp.helper.iptables import show_iptables, make_iptables
